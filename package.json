@@ -5,9 +5,11 @@
   "main": "index.html",
   "scripts": {
     "start": "python -m http.server 8080 || python3 -m http.server 8080 || npx serve .",
-    "dev": "npx serve admin --port 3000",
+    "dev": "cd admin && npm run dev",
     "dev:h5": "npx serve . --port 8080",
-    "build": "echo '静态项目构建完成'",
+    "dev:admin": "cd admin && npm run dev",
+    "build": "cd admin && npm run build",
+    "build:admin": "cd admin && npm run build",
     "serve": "npx serve .",
     "serve:admin": "npx serve admin --port 3000",
     "deploy": "echo '请将项目文件上传到静态托管服务'",
@@ -15,14 +17,29 @@
     "test": "echo '测试完成'"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@element-plus/icons-vue": "^2.3.2",
+    "@supabase/supabase-js": "^2.39.0",
+    "element-plus": "^2.11.2",
+    "pinia": "^3.0.3",
+    "vue-router": "^4.5.1"
   },
   "devDependencies": {
-    "serve": "^14.2.1",
+    "@vitejs/plugin-vue": "^6.0.1",
     "eslint": "^8.0.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.0",
+    "serve": "^14.2.1",
+    "vite": "^7.1.5"
   },
-  "keywords": ["travel", "guide", "h5", "admin", "supabase", "static", "map", "tourism"],
+  "keywords": [
+    "travel",
+    "guide",
+    "h5",
+    "admin",
+    "supabase",
+    "static",
+    "map",
+    "tourism"
+  ],
   "author": "旅游导览团队",
   "license": "MIT",
   "engines": {
