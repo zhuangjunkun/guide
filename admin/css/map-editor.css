@@ -1,0 +1,396 @@
+/* 地图编辑器样式 */
+.map-editor-container {
+    display: flex;
+    height: calc(100vh - 80px);
+    background: #f8f9fa;
+}
+
+/* 地图容器 */
+.map-container {
+    flex: 1;
+    position: relative;
+    background: #e9ecef;
+}
+
+#map-container {
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* 编辑模式样式 */
+.map-container.editing-mode {
+    cursor: crosshair;
+}
+
+.map-container.editing-mode .leaflet-container {
+    cursor: crosshair;
+}
+
+/* 控制面板 */
+.map-controls {
+    width: 300px;
+    background: white;
+    border-left: 1px solid #dee2e6;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.control-section {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.control-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.control-section h3 {
+    margin: 0 0 16px 0;
+    color: #265073;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* 开关控件 */
+.switch-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2D9596;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+/* 按钮样式 */
+.btn-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    color: #265073;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:hover {
+    background: #f8f9fa;
+    border-color: #2D9596;
+}
+
+.btn-primary {
+    background: #2D9596;
+    color: white;
+    border-color: #2D9596;
+}
+
+.btn-primary:hover {
+    background: #265073;
+    border-color: #265073;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    border-color: #c82333;
+}
+
+.btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+/* 表单控件 */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #265073;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #2D9596;
+    box-shadow: 0 0 0 2px rgba(45, 149, 150, 0.1);
+}
+
+select.form-control {
+    background: white;
+}
+
+/* 自定义标记样式 */
+.custom-marker {
+    background: none !important;
+    border: none !important;
+}
+
+.marker-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #2D9596;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+    transition: all 0.2s;
+}
+
+.marker-icon.selected {
+    box-shadow: 0 0 0 3px #FF6B6B;
+    transform: scale(1.1);
+}
+
+.marker-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FF6B6B;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* 弹出窗口样式 */
+.marker-popup {
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.marker-popup h3 {
+    margin: 0 0 8px 0;
+    color: #265073;
+    font-size: 16px;
+}
+
+.marker-popup p {
+    margin: 0 0 12px 0;
+    color: #6c757d;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.marker-popup img {
+    width: 100%;
+    border-radius: 4px;
+    margin: 8px 0;
+}
+
+.popup-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+/* 标记详情面板 */
+.marker-details {
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.marker-details h3 {
+    margin: 0 0 12px 0;
+    color: #265073;
+    font-size: 18px;
+}
+
+.marker-info {
+    font-size: 14px;
+}
+
+.marker-info p {
+    margin: 8px 0;
+    color: #495057;
+}
+
+.marker-info strong {
+    color: #265073;
+}
+
+/* 工具栏 */
+.map-toolbar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: white;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    gap: 8px;
+}
+
+/* 加载状态 */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2D9596;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .map-editor-container {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    .map-container {
+        height: 400px;
+    }
+    
+    .map-controls {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .map-toolbar {
+        top: 10px;
+        right: 10px;
+        padding: 8px;
+    }
+}
+
+/* 暗色模式支持 */
+@media (prefers-color-scheme: dark) {
+    .map-editor-container {
+        background: #1a1a1a;
+    }
+    
+    .map-controls {
+        background: #2d2d2d;
+        border-left-color: #404040;
+    }
+    
+    .control-section {
+        border-bottom-color: #404040;
+    }
+    
+    .btn {
+        background: #3d3d3d;
+        border-color: #555;
+        color: #fff;
+    }
+    
+    .btn:hover {
+        background: #4d4d4d;
+    }
+    
+    .form-control {
+        background: #3d3d3d;
+        border-color: #555;
+        color: #fff;
+    }
+    
+    .marker-details {
+        background: #2d2d2d;
+    }
+}

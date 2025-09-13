@@ -1,0 +1,88 @@
+<div class="categories-page">
+    <div class="page-toolbar">
+        <div class="search-box">
+            <input type="text" id="categorySearch" placeholder="搜索分类..." class="search-input">
+            <button class="search-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </button>
+        </div>
+        <button class="btn btn-primary" id="createCategoryBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            新建分类
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>图标</th>
+                    <th>描述</th>
+                    <th>排序</th>
+                    <th>状态</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="categoriesTable">
+                <tr>
+                    <td colspan="7" class="loading-row">加载中...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination" id="categoriesPagination">
+        <button class="pagination-btn" disabled>上一页</button>
+        <span class="pagination-info">第 1 页</span>
+        <button class="pagination-btn" disabled>下一页</button>
+    </div>
+</div>
+
+<!-- 分类编辑模态框 -->
+<div class="modal" id="categoryModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="categoryModalTitle">新建分类</h3>
+            <button class="modal-close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="categoryForm">
+                <input type="hidden" id="categoryId">
+                <div class="form-group">
+                    <label for="categoryName">分类名称 *</label>
+                    <input type="text" id="categoryName" required class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="categoryIcon">图标</label>
+                    <input type="text" id="categoryIcon" placeholder="例如: 🏛️" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="categoryDescription">描述</label>
+                    <textarea id="categoryDescription" class="form-textarea" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categorySortOrder">排序</label>
+                    <input type="number" id="categorySortOrder" value="0" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label for="categoryStatus">状态</label>
+                    <select id="categoryStatus" class="form-select">
+                        <option value="true">启用</option>
+                        <option value="false">禁用</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button class="btn btn-primary" id="saveCategoryBtn">保存</button>
+        </div>
+    </div>
+</div>

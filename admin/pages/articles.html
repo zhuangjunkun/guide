@@ -1,0 +1,132 @@
+<div class="articles-page">
+    <div class="page-toolbar">
+        <div class="filters">
+            <select id="articleCategoryFilter" class="filter-select">
+                <option value="">所有分类</option>
+            </select>
+            <select id="articleStatusFilter" class="filter-select">
+                <option value="">所有状态</option>
+                <option value="published">已发布</option>
+                <option value="draft">草稿</option>
+            </select>
+        </div>
+        <div class="search-box">
+            <input type="text" id="articleSearch" placeholder="搜索文章..." class="search-input">
+            <button class="search-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </button>
+        </div>
+        <button class="btn btn-primary" id="createArticleBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            新建文章
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>分类</th>
+                    <th>作者</th>
+                    <th>浏览量</th>
+                    <th>点赞数</th>
+                    <th>状态</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="articlesTable">
+                <tr>
+                    <td colspan="8" class="loading-row">加载中...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination" id="articlesPagination">
+        <button class="pagination-btn" disabled>上一页</button>
+        <span class="pagination-info">第 1 页</span>
+        <button class="pagination-btn" disabled>下一页</button>
+    </div>
+</div>
+
+<!-- 文章编辑模态框 -->
+<div class="modal" id="articleModal">
+    <div class="modal-content xlarge">
+        <div class="modal-header">
+            <h3 id="articleModalTitle">新建文章</h3>
+            <button class="modal-close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="articleForm">
+                <input type="hidden" id="articleId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="articleTitle">文章标题 *</label>
+                        <input type="text" id="articleTitle" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="articleCategory">分类</label>
+                        <select id="articleCategory" class="form-select">
+                            <option value="">选择分类</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="articleSlug">URL别名</label>
+                    <input type="text" id="articleSlug" class="form-input" placeholder="将自动生成">
+                </div>
+
+                <div class="form-group">
+                    <label for="articleSummary">文章摘要</label>
+                    <textarea id="articleSummary" class="form-textarea" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="articleContent">文章内容 *</label>
+                    <textarea id="articleContent" class="form-textarea" rows="10"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="articleAuthor">作者</label>
+                        <input type="text" id="articleAuthor" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="articleCover">封面图片</label>
+                        <input type="file" id="articleCover" accept="image/*" style="display: none;">
+                        <button type="button" class="btn btn-secondary" id="uploadCoverBtn">选择封面</button>
+                        <div class="cover-preview" id="coverPreview"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="articleStatus">发布状态</label>
+                        <select id="articleStatus" class="form-select">
+                            <option value="draft">草稿</option>
+                            <option value="published">已发布</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="articlePublishDate">发布时间</label>
+                        <input type="datetime-local" id="articlePublishDate" class="form-input">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button class="btn btn-primary" id="saveArticleBtn">保存</button>
+            <button class="btn btn-success" id="publishArticleBtn" style="display: none;">发布</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,138 @@
+<div class="attractions-page">
+    <div class="page-toolbar">
+        <div class="filters">
+            <select id="categoryFilter" class="filter-select">
+                <option value="">所有分类</option>
+            </select>
+            <select id="statusFilter" class="filter-select">
+                <option value="">所有状态</option>
+                <option value="true">已启用</option>
+                <option value="false">已禁用</option>
+            </select>
+        </div>
+        <div class="search-box">
+            <input type="text" id="attractionSearch" placeholder="搜索景点..." class="search-input">
+            <button class="search-btn">
+                <svg viewBox="0 0 24 24" width="16" height="16">
+                    <path fill="currentColor" d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                </svg>
+            </button>
+        </div>
+        <button class="btn btn-primary" id="createAttractionBtn">
+            <svg viewBox="0 0 24 24" width="16" height="16">
+                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+            </svg>
+            新建景点
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>名称</th>
+                    <th>分类</th>
+                    <th>位置</th>
+                    <th>评分</th>
+                    <th>浏览量</th>
+                    <th>特色</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody id="attractionsTable">
+                <tr>
+                    <td colspan="8" class="loading-row">加载中...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination" id="attractionsPagination">
+        <button class="pagination-btn" disabled>上一页</button>
+        <span class="pagination-info">第 1 页</span>
+        <button class="pagination-btn" disabled>下一页</button>
+    </div>
+</div>
+
+<!-- 景点编辑模态框 -->
+<div class="modal" id="attractionModal">
+    <div class="modal-content large">
+        <div class="modal-header">
+            <h3 id="attractionModalTitle">新建景点</h3>
+            <button class="modal-close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="attractionForm">
+                <input type="hidden" id="attractionId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="attractionName">景点名称 *</label>
+                        <input type="text" id="attractionName" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="attractionCategory">分类</label>
+                        <select id="attractionCategory" class="form-select">
+                            <option value="">选择分类</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="attractionDescription">详细描述</label>
+                    <textarea id="attractionDescription" class="form-textarea" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="attractionSummary">简介</label>
+                    <textarea id="attractionSummary" class="form-textarea" rows="2"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="attractionAddress">地址</label>
+                        <input type="text" id="attractionAddress" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="attractionPhone">联系电话</label>
+                        <input type="tel" id="attractionPhone" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="attractionLatitude">纬度</label>
+                        <input type="number" id="attractionLatitude" step="any" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="attractionLongitude">经度</label>
+                        <input type="number" id="attractionLongitude" step="any" class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="attractionImages">图片</label>
+                    <div class="image-uploader">
+                        <input type="file" id="attractionImages" multiple accept="image/*" style="display: none;">
+                        <button type="button" class="btn btn-secondary" id="uploadImagesBtn">选择图片</button>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="attractionStatus">状态</label>
+                    <select id="attractionStatus" class="form-select">
+                        <option value="true">启用</option>
+                        <option value="false">禁用</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" data-dismiss="modal">取消</button>
+            <button class="btn btn-primary" id="saveAttractionBtn">保存</button>
+        </div>
+    </div>
+</div>

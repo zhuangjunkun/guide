@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>旅游导览 - 地图</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/map.css">
+</head>
+<body>
+    <!-- 地图容器 -->
+    <div class="map-container">
+        <!-- 渐变背景 -->
+        <div class="map-background"></div>
+        
+        <!-- 手绘地图 -->
+        <div class="map-wrapper" id="mapWrapper">
+            <div class="map-content" id="mapContent">
+                <!-- 响应式地图图片 - 支持WebP格式 -->
+                <picture>
+                    <!-- 默认图片 -->
+                    <img class="map-image" id="mapImage" src="./assets/map.png" alt="旅游地图" draggable="false">
+                </picture>
+                
+                <!-- 景点标记 -->
+                <div class="marker" data-id="1" style="left: 25%; top: 30%;">
+                    <div class="marker-pulse"></div>
+                    <div class="marker-icon"></div>
+                </div>
+
+                <div class="marker" data-id="2" style="left: 45%; top: 25%;">
+                    <div class="marker-pulse"></div>
+                    <div class="marker-icon"></div>
+                </div>
+
+                <div class="marker" data-id="3" style="left: 60%; top: 45%;">
+                    <div class="marker-pulse"></div>
+                    <div class="marker-icon"></div>
+                </div>
+
+                <div class="marker" data-id="4" style="left: 35%; top: 60%;">
+                    <div class="marker-pulse"></div>
+                    <div class="marker-icon"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 功能按钮组 -->
+        <div class="map-controls">
+            <button class="control-btn" id="locateBtn" title="定位">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8.94 3A8.994 8.994 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.994 8.994 0 0 0 11 20.94V23h2v-2.06A8.994 8.994 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="zoomInBtn" title="放大">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                </svg>
+            </button>
+            <button class="control-btn" id="zoomOutBtn" title="缩小">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M19 13H5v-2h14v2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- 弹窗背景遮罩 -->
+    <div class="popup-backdrop" id="popupBackdrop"></div>
+    
+    <!-- 景点信息弹窗 -->
+    <div class="marker-popup" id="markerPopup">
+        <div class="popup-content">
+            <div class="popup-header">
+                <h3 class="popup-title" id="popupTitle">景点名称</h3>
+                <button class="popup-close" id="popupClose">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="popup-body">
+                <p class="popup-description" id="popupDescription">景点描述</p>
+                <div class="popup-actions">
+                    <button class="action-btn primary" id="navigateBtn">
+                        <svg viewBox="0 0 24 24" width="18" height="18">
+                            <path fill="currentColor" d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+                        </svg>
+                        导航
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <footer class="bottom-nav">
+             <div class="nav-item active" data-page="map">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+            </svg>
+            <span class="nav-text">导览</span>
+        </div>
+        <div class="nav-item" data-page="guide">
+            <svg class="nav-icon" viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+            <span class="nav-text">攻略</span>
+        </div>
+   
+    </footer>
+
+    <script src="js/common.js"></script>
+    <script src="js/map.js"></script>
+</body>
+</html>

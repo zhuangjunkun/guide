@@ -1,0 +1,46 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="800" height="600" fill="#e8f5e8"/>
+  
+  <!-- 山脉 -->
+  <path d="M0,400 Q200,300 400,350 Q600,280 800,320 L800,600 L0,600 Z" fill="#c8e6c9"/>
+  <path d="M0,450 Q150,380 300,400 Q500,350 800,380 L800,600 L0,600 Z" fill="#a5d6a7"/>
+  
+  <!-- 湖泊 -->
+  <ellipse cx="200" cy="200" rx="80" ry="50" fill="#81c784"/>
+  <ellipse cx="600" cy="150" rx="60" ry="40" fill="#81c784"/>
+  
+  <!-- 河流 -->
+  <path d="M280,200 Q400,250 500,180 Q650,120 800,140" stroke="#66bb6a" stroke-width="8" fill="none"/>
+  
+  <!-- 道路 -->
+  <path d="M0,300 Q200,280 400,300 Q600,320 800,300" stroke="#8d6e63" stroke-width="4" fill="none" stroke-dasharray="10,5"/>
+  <path d="M200,0 Q220,200 250,400 Q280,500 300,600" stroke="#8d6e63" stroke-width="4" fill="none" stroke-dasharray="10,5"/>
+  
+  <!-- 建筑区域 -->
+  <rect x="150" y="280" width="100" height="80" fill="#ffcc80" opacity="0.7"/>
+  <rect x="500" y="250" width="120" height="100" fill="#ffcc80" opacity="0.7"/>
+  
+  <!-- 森林 -->
+  <circle cx="100" cy="100" r="30" fill="#4caf50" opacity="0.6"/>
+  <circle cx="120" cy="80" r="25" fill="#4caf50" opacity="0.6"/>
+  <circle cx="80" cy="90" r="20" fill="#4caf50" opacity="0.6"/>
+  
+  <circle cx="700" cy="400" r="35" fill="#4caf50" opacity="0.6"/>
+  <circle cx="720" cy="380" r="30" fill="#4caf50" opacity="0.6"/>
+  <circle cx="680" cy="390" r="25" fill="#4caf50" opacity="0.6"/>
+  
+  <!-- 地标标识 -->
+  <text x="200" y="190" font-family="Arial" font-size="12" fill="#2e7d32" text-anchor="middle">西湖</text>
+  <text x="200" y="320" font-family="Arial" font-size="12" fill="#5d4037" text-anchor="middle">古城区</text>
+  <text x="560" y="300" font-family="Arial" font-size="12" fill="#5d4037" text-anchor="middle">新区</text>
+  <text x="100" y="105" font-family="Arial" font-size="10" fill="#1b5e20" text-anchor="middle">山林</text>
+  
+  <!-- 网格线（用于编辑参考） -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ddd" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="600" fill="url(#grid)" opacity="0"/>
+</svg>

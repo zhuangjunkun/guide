@@ -1,0 +1,490 @@
+/* 地图页面样式 */
+.map-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 60px; /* 底部导航高度 */
+    overflow: hidden;
+}
+
+.map-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('../assets/bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: 1;
+}
+
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    cursor: grab;
+    overflow: hidden;
+}
+
+.map-wrapper.dragging {
+    cursor: grabbing;
+}
+
+.map-content {
+    position: relative;
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+.map-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 12px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    display: block;
+    /* 图片优化 */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    /* 确保图片清晰度 */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    /* 硬件加速 */
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* 移动端图片优化 */
+@media (max-width: 768px) {
+    .map-image {
+        max-width: 95vw;
+        max-height: 85vh;
+        /* 移动端使用更平滑的渲染 */
+        image-rendering: auto;
+        image-rendering: -webkit-optimize-contrast;
+    }
+}
+
+@media (max-width: 480px) {
+    .map-image {
+        max-width: 98vw;
+        max-height: 80vh;
+        border-radius: 8px;
+    }
+}
+
+/* 景点标记 */
+.marker {
+    position: absolute;
+    z-index: 10;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease;
+    pointer-events: auto;
+}
+
+/* 添加点击提示动画 */
+.marker::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(46, 139, 87, 0.6);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: clickHint 3s infinite;
+    pointer-events: none;
+}
+
+@keyframes clickHint {
+    0%, 70% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    80% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    90% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.4);
+        opacity: 0;
+    }
+}
+
+.marker-icon {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    background: rgba(46, 139, 87, 0.9);
+    border: 3px solid white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    pointer-events: auto;
+    backdrop-filter: blur(5px);
+}
+
+.marker-icon::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.marker:hover .marker-icon {
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(46, 139, 87, 0.5);
+    background: rgba(46, 139, 87, 1);
+}
+
+.marker:active .marker-icon {
+    transform: scale(0.9);
+}
+
+/* 标记脉冲动画 */
+.marker-pulse {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(46, 139, 87, 0.4);
+    transform: translate(-50%, -50%);
+    animation: pulse 2.5s infinite;
+    pointer-events: none;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+/* 移除标记标签样式 */
+.marker-label {
+    display: none;
+}
+
+/* 地图控制按钮 */
+.map-controls {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 20;
+}
+
+.control-btn {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+.control-btn:hover {
+    background: white;
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+/* 弹窗背景遮罩 */
+.popup-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.popup-backdrop.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* 景点信息弹窗 */
+.marker-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 32px);
+    max-width: 400px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    max-height: 80vh;
+    overflow: hidden;
+}
+
+.marker-popup.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    position: relative;
+}
+
+.popup-header {
+    position: relative;
+    padding: 20px 20px 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 16px;
+}
+
+.popup-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+}
+
+.popup-close {
+    width: 32px;
+    height: 32px;
+    background: #f8f9fa;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.3s ease;
+    margin-left: 16px;
+}
+
+.popup-close:hover {
+    background: white;
+    color: #333;
+    transform: scale(1.05);
+}
+
+.popup-body {
+    padding: 0 20px 20px 20px;
+}
+
+.popup-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.popup-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.action-btn {
+    width: 100%;
+    max-width: 200px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.action-btn.primary {
+    background: #2E8B57;
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background: #236B43;
+    transform: translateY(-1px);
+}
+
+/* 移动端缩放优化 */
+.map-content.zoomed {
+    transform-origin: center center;
+}
+
+.map-content.zoom-1 { transform: scale(1.2); }
+.map-content.zoom-2 { transform: scale(1.5); }
+.map-content.zoom-3 { transform: scale(2.0); }
+.map-content.zoom-4 { transform: scale(2.5); }
+
+/* 移动端拖拽优化 */
+@media (max-width: 768px) {
+    .map-wrapper {
+        touch-action: pan-x pan-y;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .map-content {
+        transition: transform 0.2s ease-out;
+    }
+    
+    /* 标记在移动端更大更容易点击 */
+    .marker-icon {
+        width: 28px;
+        height: 28px;
+        border-width: 4px;
+    }
+    
+    .marker-icon::before {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .map-controls {
+        right: 8px;
+        gap: 6px;
+        bottom: 80px;
+        top: auto;
+        transform: none;
+    }
+    
+    .control-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    .marker-popup {
+        width: calc(100% - 20px);
+        max-height: 70vh;
+    }
+    
+    .popup-image {
+        height: 140px;
+    }
+    
+    .action-btn {
+        height: 42px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 375px) {
+    .map-controls {
+        right: 6px;
+        gap: 4px;
+    }
+    
+    .control-btn {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .popup-content {
+        padding: 12px;
+    }
+    
+    .popup-image {
+        height: 120px;
+    }
+    
+    .action-btn {
+        height: 40px;
+        font-size: 13px;
+    }
+}
+
+/* 触摸设备优化 */
+@media (hover: none) and (pointer: coarse) {
+    .marker {
+        /* 增加触摸区域 */
+        padding: 8px;
+        margin: -8px;
+    }
+    
+    .marker-icon {
+        width: 32px;
+        height: 32px;
+        border-width: 4px;
+    }
+    
+    .marker-icon::before {
+        width: 12px;
+        height: 12px;
+    }
+    
+    /* 移除hover效果，使用active效果 */
+    .marker:hover .marker-icon {
+        transform: none;
+    }
+    
+    .marker:active .marker-icon {
+        transform: scale(1.1);
+        background: rgba(46, 139, 87, 1);
+    }
+}
+
+/* 高DPI屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .map-image {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}

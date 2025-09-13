@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仪表盘 - 旅游导览系统</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-fixes.css">
+</head>
+<body>
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+        <div class="header-left">
+            <h1 class="logo">旅游导览管理系统</h1>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <span class="username">管理员</span>
+                <div class="user-avatar">A</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主布局 -->
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="admin-sidebar">
+            <nav class="sidebar-nav">
+                <div class="nav-item active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="currentColor" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                    </svg>
+                    <span class="nav-text">仪表盘</span>
+                </div>
+                <div class="nav-item">
+                    <a href="standalone-categories.html" style="text-decoration: none; color: inherit;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M12 2l-5.5 9h11L12 2zm0 3.84L13.93 9h-3.87L12 5.84zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5s2.01 4.5 4.5 4.5 4.5-2.01 4.5-4.5-2.01-4.5-4.5-4.5zm0 7c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
+                        </svg>
+                        <span class="nav-text">分类管理</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="standalone-attractions.html" style="text-decoration: none; color: inherit;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M17 5.33C17 3.5 15.5 2 13.67 2H5.33C3.5 2 2 3.5 2 5.33v8.34C2 15.5 3.5 17 5.33 17h8.34c1.83 0 3.33-1.5 3.33-3.33V5.33zM7 7c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm6 8H5v-1c0-1.1 1.79-2 4-2s4 .9 4 2v1z"/>
+                        </svg>
+                        <span class="nav-text">景点管理</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="standalone-articles.html" style="text-decoration: none; color: inherit;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                        </svg>
+                        <span class="nav-text">攻略文章</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="standalone-map-editor.html" style="text-decoration: none; color: inherit;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+                        </svg>
+                        <span class="nav-text">地图编辑器</span>
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="standalone-settings.html" style="text-decoration: none; color: inherit;">
+                        <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="currentColor" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                        </svg>
+                        <span class="nav-text">系统设置</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 主内容区域 -->
+        <main class="admin-main">
+            <div class="page-header">
+                <h2>仪表盘</h2>
+            </div>
+            
+            <div class="page-content">
+                <!-- 页面内容 -->
+                <div class="dashboard-page">
+                    <!-- 统计卡片 -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalCategories">0</h3>
+                                <p class="stat-label">分类数量</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M17 5.33C17 3.5 15.5 2 13.67 2H5.33C3.5 2 2 3.5 2 5.33v8.34C2 15.5 3.5 17 5.33 17h8.34c1.83 0 3.33-1.5 3.33-3.33V5.33zM7 7c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm6 8H5v-1c0-1.1 1.79-2 4-2s4 .9 4 2v1z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalAttractions">0</h3>
+                                <p class="stat-label">景点数量</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalArticles">0</h3>
+                                <p class="stat-label">文章数量</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg viewBox="0 0 24 24" width="24" height="24">
+                                    <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-value" id="totalUsers">0</h3>
+                                <p class="stat-label">用户数量</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最近活动 -->
+                    <div class="dashboard-section">
+                        <h3>最近活动</h3>
+                        <div class="recent-activities" id="recentActivities">
+                            <div class="activity-item">
+                                <div class="activity-icon">📝</div>
+                                <div class="activity-content">
+                                    <p>系统初始化完成</p>
+                                    <span class="activity-time">刚刚</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 快速操作 -->
+                    <div class="dashboard-section">
+                        <h3>快速操作</h3>
+                        <div class="quick-actions">
+                            <a href="standalone-articles.html" class="quick-action-btn">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+                                </svg>
+                                新建文章
+                            </a>
+                            <a href="standalone-attractions.html" class="quick-action-btn">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                                添加景点
+                            </a>
+                            <a href="standalone-map-editor.html" class="quick-action-btn">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path fill="currentColor" d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/>
+                                </svg>
+                                地图编辑器
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 依赖库 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../config/supabase.js"></script>
+    <script src="../config/tencent-cloud.js"></script>
+    
+    <!-- 工具库 -->
+    <script src="js/config.js"></script>
+    <script src="js/tencent-cloud-service.js"></script>
+    <script src="js/api.js"></script>
+    
+    <!-- 页面特定脚本 -->
+    <script src="js/modules/dashboard.js"></script>
+    
+    <script>
+        // 简单的页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('仪表盘页面已加载');
+            
+            // 这里可以添加一些基本的页面初始化逻辑
+            // 完整的交互功能需要加载对应的JavaScript模块
+        });
+    </script>
+</body>
+</html>
