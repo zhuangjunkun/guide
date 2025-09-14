@@ -126,4 +126,50 @@ export class AuthService {
       }
     }
   }
+  
+  // 创建管理员用户并关联到Supabase Auth
+  static async createAdminUser(email, password, adminUserData) {
+    try {
+      // 首先在Supabase Auth中创建用户
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: adminUserData.name || '管理员',
+            role: adminUserData.role || 'admin'
+          }
+        }
+      })
+      
+      if (authError) throw authError
+      
+      // 将用户信息保存到admin_users表
+      const { data: adminUser, error: adminError } = await supabase
+        .from(TABLES.ADMIN_USERS)
+        .insert([{
+          user_id: authData.user.id,
+          email: email,
+          name: adminUserData.name || '管理员',
+          role: adminUserData.role || 'admin',
+          is_active: true,
+          created_at: new Date().toISOString()
+        }])
+        .select()
+        .single()
+      
+      if (adminError) throw adminError
+      
+      return { 
+        success: true, 
+        data: { user: authData.user, admin: adminUser },
+        message: '管理员用户创建成功' 
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        message: handleSupabaseError(error, '创建管理员用户') 
+      }
+    }
+  }
 }

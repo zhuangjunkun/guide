@@ -111,28 +111,26 @@ const router = createRouter({
   routes
 })
 
-// 路由守卫
+// 简单的路由守卫
 router.beforeEach((to, from, next) => {
-  const isAuthenticated = localStorage.getItem('admin_token')
-  
-  // 如果访问登录页
-  if (to.name === 'Login') {
-    // 如果已经认证，则重定向到首页
-    if (isAuthenticated) {
-      next('/')
+  // 检查是否需要认证
+  if (to.meta.requiresAuth !== false) {
+    // 检查是否有简单的认证token
+    const isAuthenticated = localStorage.getItem('admin_token') && localStorage.getItem('admin_user');
+    if (!isAuthenticated) {
+      next('/login');
     } else {
-      // 否则允许访问登录页
-      next()
+      next();
     }
-  } 
-  // 如果访问需要认证的页面
-  else if (to.meta.requiresAuth !== false && !isAuthenticated) {
-    // 如果未认证，重定向到登录页
-    next('/login')
-  } 
-  // 其他情况，正常访问
-  else {
-    next()
+  } else {
+    // 不需要认证的页面（如登录页）
+    const isAuthenticated = localStorage.getItem('admin_token') && localStorage.getItem('admin_user');
+    if (to.name === 'Login' && isAuthenticated) {
+      // 如果已登录且访问登录页，则重定向到首页
+      next('/');
+    } else {
+      next();
+    }
   }
 })
 

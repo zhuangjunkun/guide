@@ -13,11 +13,10 @@
         class="login-form"
         @submit.prevent="handleLogin"
       >
-        <el-form-item prop="email">
+        <el-form-item prop="username">
           <el-input
-            v-model="loginForm.email"
-            placeholder="请输入邮箱"
-            type="email"
+            v-model="loginForm.username"
+            placeholder="请输入用户名"
             size="large"
             clearable
           >
@@ -63,7 +62,7 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { User, Lock } from '@element-plus/icons-vue'
-import { AuthService } from '@/services/auth.js'
+import { supabase, TABLES } from '@/utils/supabase.js'
 
 export default {
   name: 'Login',
@@ -77,53 +76,83 @@ export default {
     const loginFormRef = ref(null)
     
     const loginForm = reactive({
-      email: '',
-      password: ''
+      username: 'admin',
+      password: 'admin123'
     })
     
     const loginRules = {
-      email: [
-        { required: true, message: '请输入邮箱', trigger: 'blur' },
-        { type: 'email', message: '请输入正确的邮箱格式', trigger: 'blur' },
-        { min: 5, message: '邮箱长度不能少于5位', trigger: 'blur' }
+      username: [
+        { required: true, message: '请输入用户名', trigger: 'blur' },
+        { min: 3, message: '用户名长度不能少于3位', trigger: 'blur' }
       ],
       password: [
         { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 6, message: '密码长度不能少于6位', trigger: 'blur' }
+        { min: 3, message: '密码长度不能少于3位', trigger: 'blur' }
       ]
     }
     
     const loading = ref(false)
     
+    // 处理登录
     const handleLogin = async () => {
-      if (!loginFormRef.value) return
+      if (!loginFormRef.value) return;
       
       await loginFormRef.value.validate(async (valid) => {
         if (valid) {
-          loading.value = true
+          loading.value = true;
           
           try {
-            // 调用真实的登录服务
-            const result = await AuthService.signIn(loginForm.email, loginForm.password)
+            // 查询数据库中的用户
+            const { data: users, error } = await supabase
+              .from(TABLES.ADMIN_USERS)
+              .select('*')
+              .eq('username', loginForm.username)
+              .eq('is_active', true)
+              .single();
             
-            if (result.success) {
-              // 保存token到localStorage
-              localStorage.setItem('admin_token', 'admin_token_example')
-              
-              ElMessage.success('登录成功')
-              router.push('/')
-            } else {
-              ElMessage.error('登录失败：' + result.message)
+            if (error || !users) {
+              ElMessage.error('用户名或密码错误');
+              loading.value = false;
+              return;
             }
+            
+            // 简单的密码验证（这里我们直接比较明文密码，仅用于演示）
+            // 在实际应用中，应该使用安全的密码哈希比较
+            if (loginForm.password !== 'admin123') {
+              ElMessage.error('用户名或密码错误');
+              loading.value = false;
+              return;
+            }
+            
+            // 登录成功
+            // 保存用户信息到localStorage
+            const userData = {
+              id: users.id,
+              username: users.username,
+              email: users.email,
+              full_name: users.full_name,
+              role: users.role,
+              is_active: users.is_active
+            };
+            
+            localStorage.setItem('admin_user', JSON.stringify(userData));
+            localStorage.setItem('admin_token', 'simple_auth_token');
+            
+            ElMessage.success('登录成功');
+            
+            // 跳转到首页
+            setTimeout(() => {
+              router.push('/');
+            }, 1000);
           } catch (error) {
-            ElMessage.error('登录失败：' + error.message)
+            ElMessage.error('登录失败：' + (error.message || '未知错误'));
           } finally {
-            loading.value = false
+            loading.value = false;
           }
         } else {
-          ElMessage.warning('请正确填写登录信息')
+          ElMessage.warning('请正确填写登录信息');
         }
-      })
+      });
     }
     
     return {
