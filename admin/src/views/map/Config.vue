@@ -107,8 +107,8 @@ function handleMapClick(coords) {
   attractionForm.value = {
     name: '',
     description: '',
-    longitude: coords.longitude,
-    latitude: coords.latitude,
+    map_x: coords.longitude,
+    map_y: coords.latitude,
   };
   dialogVisible.value = true;
 }

@@ -30,20 +30,36 @@ class MapApp {
         const response = await AttractionService.getAll();
         if (response.success && response.data) {
             this.markers = response.data.reduce((acc, attraction) => {
-                // 假设 location 格式为 "lng,lat"
-                const lat = attraction.latitude
-                const lng = attraction.longitude
-                acc[attraction.id] = {
-                    id: attraction.id,
-                    name: attraction.name,
-                    description: attraction.description,
-                    image: (attraction.images && attraction.images.length > 0) 
-                        ? attraction.images[0] 
-                        : `https://picsum.photos/300/150?random=${attraction.id}`,
-                    coordinates: { lat, lng }
-                };
-                return acc;
-            }, {});
+                    // 使用相对坐标字段（map_x, map_y），如果不存在则使用经纬度字段
+                    let lng = 0, lat = 0;
+                    
+                    // 优先使用 map_x 和 map_y 字段（相对坐标）
+                    if (typeof attraction.map_x === 'number' && typeof attraction.map_y === 'number') {
+                        lng = attraction.map_x;
+                        lat = attraction.map_y;
+                    } 
+                    // 如果 map_x/map_y 不存在，尝试使用 longitude/latitude（相对坐标）
+                    else if (typeof attraction.longitude === 'number' && typeof attraction.latitude === 'number') {
+                        lng = attraction.longitude;
+                        lat = attraction.latitude;
+                    }
+                    // 如果都没有有效坐标，跳过这个标记
+                    else {
+                        console.warn(`Skipping marker "${attraction.name}" due to invalid coordinates.`);
+                        return acc;
+                    }
+
+                    acc[attraction.id] = {
+                        id: attraction.id,
+                        name: attraction.name,
+                        description: attraction.description,
+                        image: (attraction.images && attraction.images.length > 0) 
+                            ? attraction.images[0] 
+                            : `https://picsum.photos/300/150?random=${attraction.id}`,
+                        coordinates: { lat, lng }
+                    };
+                    return acc;
+                }, {});
         } else {
             console.error('Failed to load attractions:', response.message);
             alert('景点数据加载失败，请稍后重试。');
@@ -74,7 +90,7 @@ class MapApp {
         
         // 标记点击事件 (使用事件委托)
         mapContent.addEventListener('click', (e) => {
-            const marker = e.target.closest('.marker');
+            const marker = e.target.closest('.marker-img');
             if (marker && !this.dragStarted) {
                 e.stopPropagation();
                 const markerId = marker.dataset.id;
@@ -83,7 +99,7 @@ class MapApp {
         });
 
         mapContent.addEventListener('touchend', (e) => {
-            const marker = e.target.closest('.marker');
+            const marker = e.target.closest('.marker-img');
             if (marker && !this.dragStarted) {
                 e.stopPropagation();
                 e.preventDefault(); // 防止触发click
@@ -94,13 +110,13 @@ class MapApp {
 
         // 防止在标记上拖动时移动地图
         mapContent.addEventListener('touchstart', (e) => {
-            if (e.target.closest('.marker')) {
+            if (e.target.closest('.marker-img')) {
                 e.stopPropagation();
             }
         });
 
         mapContent.addEventListener('touchmove', (e) => {
-            if (e.target.closest('.marker')) {
+            if (e.target.closest('.marker-img')) {
                 e.stopPropagation();
             }
         });
@@ -157,43 +173,42 @@ class MapApp {
 
             const position = this.convertGeoToPixels(lat, lng);
 
-            const markerElement = document.createElement('div');
-            markerElement.className = 'marker';
+            const markerElement = document.createElement('img');
+            markerElement.className = 'marker-img';
             markerElement.dataset.id = id;
             // markerElement.style.left = `${position.x}px`;
             // markerElement.style.top = `${position.y}px`;
-             markerElement.style.left = `${lat}%`;
-            markerElement.style.top = `${lng}%`;
-
-            const markerLabel = document.createElement('span');
-            markerLabel.textContent = markerData.name;
-            markerElement.appendChild(markerLabel);
+             markerElement.style.left = `${lng*100-1}%`;
+            markerElement.style.top = `${lat*100*0.5}%`;
+            markerElement.style.width = `20px`;
+            markerElement.style.height = `20px`;
+            markerElement.src = './assets/marker.png'
+            // const markerLabel = document.createElement('span');
+            // markerLabel.textContent = markerData.name;
+            // markerElement.appendChild(markerLabel);
 
             mapContent.appendChild(markerElement);
         }
     }
 
-    // 将地理坐标转换为像素坐标
-    // 注意：这是一个占位符实现。您需要根据您的地图图像和地理边界进行调整。
+    // 将相对坐标转换为像素坐标
+    // 注意：这里的坐标是相对坐标（0-1之间），需要根据地图图像的实际尺寸进行转换
     convertGeoToPixels(lat, lng) {
-        // 示例边界 - 需要替换为实际值
-        const mapBounds = {
-            width: 3000,  // 地图图像宽度（像素）
-            height: 2250, // 地图图像高度（像素）
-            geo: {
-                top: 30.33,    // 地图顶部的纬度
-                bottom: 30.18, // 地图底部的纬度
-                left: 120.05,  // 地图左侧的经度
-                right: 120.25  // 地图右侧的经度
-            }
-        };
-
-        const lngRange = mapBounds.geo.right - mapBounds.geo.left;
-        const latRange = mapBounds.geo.top - mapBounds.geo.bottom;
-
-        const x = ((lng - mapBounds.geo.left) / lngRange) * mapBounds.width;
-        const y = ((mapBounds.geo.top - lat) / latRange) * mapBounds.height;
-
+        // 获取地图图像的实际尺寸
+        const mapImage = document.getElementById('mapImage');
+        if (!mapImage) {
+            // 如果无法获取地图图像，使用默认尺寸
+            console.warn('无法获取地图图像，使用默认尺寸');
+            return { x: lng * 3000, y: lat * 2250 };
+        }
+        
+        const mapWidth = mapImage.naturalWidth || mapImage.width || 3000;
+        const mapHeight = mapImage.naturalHeight || mapImage.height || 2250;
+        
+        // 将相对坐标（0-1）转换为像素坐标
+        const x = lng * mapWidth;
+        const y = lat * mapHeight;
+        
         return { x, y };
     }
 

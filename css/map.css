@@ -361,6 +361,26 @@
     transform: translateY(-1px);
 }
 
+.marker-img{
+    position: absolute;
+    animation: scale 2s infinite;
+}
+
+@keyframes scale {
+    0% {
+        transform:scale(0.7);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform:scale(0.7);
+        opacity: 0.6;
+    }
+}
+
 /* 移动端缩放优化 */
 .map-content.zoomed {
     transform-origin: center center;

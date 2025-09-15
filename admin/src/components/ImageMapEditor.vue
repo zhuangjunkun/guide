@@ -103,8 +103,8 @@ export default {
 
       markers.forEach(markerData => {
         // Using longitude for X, latitude for Y
-        const lat = markerData.latitude * height;
-        const lng = markerData.longitude * width;
+        const lat = markerData.map_y * height;
+        const lng = markerData.map_x * width;
 
         const marker = L.marker([lat, lng], {
           draggable: true,
