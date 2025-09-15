@@ -22,7 +22,6 @@
           :image-url="mapImageUrl"
           :markers="attractions"
           @map-click="handleMapClick"
-          @marker-drag="handleMarkerDrag"
         />
         <el-empty v-else description="地图图片加载失败"></el-empty>
       </div>
@@ -162,8 +161,6 @@ async function handleSaveAttraction(formData) {
 
 <style scoped>
 .map-config-page {
-  padding: 20px;
-  height: calc(100vh - 90px);
   display: flex;
   flex-direction: column;
 }

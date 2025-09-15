@@ -63,12 +63,12 @@
           </el-col>
         </el-row>
         
-        <el-form-item label="文章摘要" prop="summary">
+        <el-form-item label="公众号链接地址" prop="summary">
           <el-input
             v-model="form.summary"
             type="textarea"
             :rows="3"
-            placeholder="请输入文章摘要"
+            placeholder="请输入公众号链接地址"
             maxlength="200"
             show-word-limit
           />
@@ -100,7 +100,7 @@
           </div>
         </el-form-item>
         
-        <el-row :gutter="20">
+        <!-- <el-row :gutter="20">
           <el-col :span="8">
             <el-form-item label="浏览量">
               <el-input v-model="form.views" disabled />
@@ -118,7 +118,7 @@
               <el-input v-model="form.author" placeholder="请输入作者" />
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
         
         <el-row :gutter="20">
           <el-col :span="12">
@@ -291,7 +291,7 @@ export default {
           try {
             const updateData = {
               title: form.title,
-              slug: form.slug,
+              slug: new Date().getTime()+'',
               summary: form.summary,
               content: form.content,
               cover_image: form.cover_image,

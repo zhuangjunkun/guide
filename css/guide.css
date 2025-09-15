@@ -2,7 +2,6 @@
 .article-list {
     display: flex;
     flex-direction: column;
-    gap: 24px;
 }
 
 /* 分类分组样式 */

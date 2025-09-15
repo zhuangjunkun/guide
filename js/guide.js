@@ -9,12 +9,18 @@ class GuideApp {
         this.init();
     }
 
-    init() {
+    async init() {
+        await this.getData()
         this.bindEvents();
-        this.loadMockData();
+        // this.loadMockData();
         this.renderArticles();
     }
-
+    async getData(){
+        const response = await ArticleService.getAll();
+        if (response.success && response.data) {
+            this.articles = response.data;
+        }
+    }
     bindEvents() {
         // 搜索功能
         const searchIcon = document.querySelector('.header-search');
@@ -136,25 +142,19 @@ class GuideApp {
     }
 
     groupArticlesByCategory() {
-        const categoryNames = {
-            'scenic': '景点',
-            'food': '美食',
-            'hotel': '住宿',
-            'shopping': '购物',
-            'culture': '文化'
-        };
-
         const groups = {};
         
         this.articles.forEach(article => {
-            const category = article.category;
-            if (!groups[category]) {
-                groups[category] = {
-                    name: categoryNames[category] || '其他',
+            const categoryId = article.category_id;
+            const categoryName = article.categories?.name || '其他';
+            
+            if (!groups[categoryId]) {
+                groups[categoryId] = {
+                    name: categoryName,
                     articles: []
                 };
             }
-            groups[category].articles.push(article);
+            groups[categoryId].articles.push(article);
         });
 
         return groups;
@@ -163,12 +163,10 @@ class GuideApp {
     renderGroupedArticles(groupedArticles) {
         let html = '';
         
-        // 按照预定义的顺序显示分类
-        const categoryOrder = ['scenic', 'food', 'hotel', 'shopping', 'culture'];
-        
-        categoryOrder.forEach(categoryKey => {
-            if (groupedArticles[categoryKey] && groupedArticles[categoryKey].articles.length > 0) {
-                const group = groupedArticles[categoryKey];
+        // 按分类ID排序显示
+        Object.keys(groupedArticles).sort().forEach(categoryId => {
+            const group = groupedArticles[categoryId];
+            if (group.articles.length > 0) {
                 html += `
                     <div class="category-group">
                         <div class="category-header">
@@ -186,29 +184,21 @@ class GuideApp {
     }
 
     renderArticleCard(article) {
-        const categoryNames = {
-            'scenic': '景点',
-            'food': '美食',
-            'hotel': '住宿',
-            'shopping': '购物',
-            'culture': '文化'
-        };
-
         return `
-            <div class="article-card" data-id="${article.id}">
+            <div class="article-card" data-url="${article.summary}">
                 <div class="article-image-container">
-                    <img class="article-image" src="${article.image}" alt="${article.title}" loading="lazy">
-                    <div class="article-category">${categoryNames[article.category] || '其他'}</div>
+                    <img class="article-image" src="${article.cover_image}" alt="${article.title}" loading="lazy">
+                    <div class="article-category">${article.categories?.name || '其他'}</div>
                 </div>
                 <div class="article-content">
                     <h3 class="article-title">${article.title}</h3>
-                    <p class="article-summary">${article.summary}</p>
-                    <div class="article-meta">
+                    <p class="article-summary">${article.content}</p>
+                    <div class="article-meta" style="display:none;">
                         <div class="article-date">
                             <svg class="stat-icon" viewBox="0 0 24 24">
                                 <path fill="currentColor" d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
                             </svg>
-                            ${Utils.formatDate(article.date)}
+                            ${Utils.formatDate(article.published_at)}
                         </div>
                         <div class="article-stats">
                             <div class="stat-item">
@@ -246,16 +236,15 @@ class GuideApp {
         const articleCards = document.querySelectorAll('.article-card');
         articleCards.forEach(card => {
             card.addEventListener('click', (e) => {
-                const articleId = e.currentTarget.dataset.id;
-                this.openArticle(articleId);
+                const url = e.currentTarget.dataset.url;
+                this.openArticle(url);
             });
         });
     }
 
-    openArticle(articleId) {
+    openArticle(url) {
         // 这里可以跳转到文章详情页
-        console.log('打开文章:', articleId);
-        // window.location.href = `article.html?id=${articleId}`;
+        window.location.href = url;
     }
 
     showSearchDialog() {
@@ -269,7 +258,7 @@ class GuideApp {
     searchArticles(keyword) {
         const filteredArticles = this.articles.filter(article => 
             article.title.includes(keyword) || 
-            article.summary.includes(keyword)
+            article.content.includes(keyword)
         );
         
         // 临时替换文章数据进行搜索结果显示

@@ -6,7 +6,7 @@
       class="sidebar"
     >
       <div class="sidebar-logo">
-        <img src="/logo.png" alt="Logo" v-if="!sidebarCollapsed">
+        <img src="/favicon.png" alt="Logo" v-if="!sidebarCollapsed">
         <span v-else>TG</span>
       </div>
       
@@ -29,14 +29,6 @@
           <el-menu-item index="/categories">分类管理</el-menu-item>
           <el-menu-item index="/attractions">景点管理</el-menu-item>
           <el-menu-item index="/articles">攻略管理</el-menu-item>
-          <el-menu-item index="/routes">路线管理</el-menu-item>
-        </el-sub-menu>
-        
-        <el-sub-menu index="system">
-          <template #title>
-            <el-icon><Setting /></el-icon>
-            <span>系统设置</span>
-          </template>
           <el-menu-item index="/map">地图配置</el-menu-item>
         </el-sub-menu>
       </el-menu>

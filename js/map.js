@@ -12,7 +12,6 @@ class MapApp {
         this.startY = 0;
         this.lastX = 0;
         this.lastY = 0;
-        
         this.markers = {}; // 数据将从API加载
         this.currentMarker = null;
     }
@@ -26,6 +25,7 @@ class MapApp {
         this.updateMarkerScale();
     }
     
+  
     async loadMarkers() {
         const response = await AttractionService.getAll();
         if (response.success && response.data) {
@@ -56,7 +56,9 @@ class MapApp {
                         image: (attraction.images && attraction.images.length > 0) 
                             ? attraction.images[0] 
                             : `https://picsum.photos/300/150?random=${attraction.id}`,
-                        coordinates: { lat, lng }
+                        coordinates: { lat, lng },
+                        lng:attraction.longitude,
+                        lat:attraction.latitude
                     };
                     return acc;
                 }, {});
@@ -164,54 +166,26 @@ class MapApp {
         for (const id in this.markers) {
             const markerData = this.markers[id];
             const { lat, lng } = markerData.coordinates;
-            console.log('latitude:', lat, 'longitude:', lng,markerData)
             // 跳过无效坐标的标记
             if (typeof lat !== 'number' || typeof lng !== 'number' || lat === 0 || lng === 0) {
                 console.warn(`Skipping marker "${markerData.name}" due to invalid coordinates.`);
                 continue;
             }
 
-            const position = this.convertGeoToPixels(lat, lng);
-
             const markerElement = document.createElement('img');
             markerElement.className = 'marker-img';
             markerElement.dataset.id = id;
-            // markerElement.style.left = `${position.x}px`;
-            // markerElement.style.top = `${position.y}px`;
-             markerElement.style.left = `${lng*100-1}%`;
-            markerElement.style.top = `${lat*100*0.5}%`;
+             markerElement.style.left = `${lng*100}%`;
+            markerElement.style.top = `${lat*100}%`;
             markerElement.style.width = `20px`;
             markerElement.style.height = `20px`;
             markerElement.src = './assets/marker.png'
-            // const markerLabel = document.createElement('span');
-            // markerLabel.textContent = markerData.name;
-            // markerElement.appendChild(markerLabel);
 
             mapContent.appendChild(markerElement);
         }
     }
 
-    // 将相对坐标转换为像素坐标
-    // 注意：这里的坐标是相对坐标（0-1之间），需要根据地图图像的实际尺寸进行转换
-    convertGeoToPixels(lat, lng) {
-        // 获取地图图像的实际尺寸
-        const mapImage = document.getElementById('mapImage');
-        if (!mapImage) {
-            // 如果无法获取地图图像，使用默认尺寸
-            console.warn('无法获取地图图像，使用默认尺寸');
-            return { x: lng * 3000, y: lat * 2250 };
-        }
-        
-        const mapWidth = mapImage.naturalWidth || mapImage.width || 3000;
-        const mapHeight = mapImage.naturalHeight || mapImage.height || 2250;
-        
-        // 将相对坐标（0-1）转换为像素坐标
-        const x = lng * mapWidth;
-        const y = lat * mapHeight;
-        
-        return { x, y };
-    }
-
+  
     // 鼠标事件处理
     handleMouseDown(e) {
         // 如果点击的是标记，不启动拖拽
@@ -404,7 +378,8 @@ class MapApp {
     // 导航功能
     navigate() {
         if (!this.currentMarker) return;
-        
+        console.log(this.currentMarker)
+        return
         const { lat, lng } = this.currentMarker.coordinates;
         
         // 检测设备类型并选择合适的地图应用
