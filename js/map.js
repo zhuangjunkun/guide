@@ -1,4 +1,3 @@
-import { AttractionService } from './supabase-service.js';
 
 // 地图页面逻辑
 class MapApp {
@@ -32,10 +31,8 @@ class MapApp {
         if (response.success && response.data) {
             this.markers = response.data.reduce((acc, attraction) => {
                 // 假设 location 格式为 "lng,lat"
-                const [lng, lat] = attraction.location 
-                    ? attraction.location.split(',').map(Number) 
-                    : [0, 0];
-
+                const lat = attraction.latitude
+                const lng = attraction.longitude
                 acc[attraction.id] = {
                     id: attraction.id,
                     name: attraction.name,
@@ -151,7 +148,7 @@ class MapApp {
         for (const id in this.markers) {
             const markerData = this.markers[id];
             const { lat, lng } = markerData.coordinates;
-
+            console.log('latitude:', lat, 'longitude:', lng,markerData)
             // 跳过无效坐标的标记
             if (typeof lat !== 'number' || typeof lng !== 'number' || lat === 0 || lng === 0) {
                 console.warn(`Skipping marker "${markerData.name}" due to invalid coordinates.`);
@@ -163,8 +160,10 @@ class MapApp {
             const markerElement = document.createElement('div');
             markerElement.className = 'marker';
             markerElement.dataset.id = id;
-            markerElement.style.left = `${position.x}px`;
-            markerElement.style.top = `${position.y}px`;
+            // markerElement.style.left = `${position.x}px`;
+            // markerElement.style.top = `${position.y}px`;
+             markerElement.style.left = `${lat}%`;
+            markerElement.style.top = `${lng}%`;
 
             const markerLabel = document.createElement('span');
             markerLabel.textContent = markerData.name;
@@ -440,5 +439,4 @@ class MapApp {
 document.addEventListener('DOMContentLoaded', () => {
     const app = new MapApp();
     app.init();
-    console.log('123',app)
 });

@@ -76,13 +76,14 @@ function initSupabaseClient() {
 
 // 在页面加载完成后初始化Supabase客户端
 if (typeof window !== 'undefined') {
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    setTimeout(initSupabaseClient, 100);
-  } else {
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(initSupabaseClient, 100);
-    });
-  }
+  initSupabaseClient()
+  // if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  //   setTimeout(initSupabaseClient, 100);
+  // } else {
+  //   document.addEventListener('DOMContentLoaded', () => {
+  //     setTimeout(initSupabaseClient, 100);
+  //   });
+  // }
 }
 
 // 数据库表名常量

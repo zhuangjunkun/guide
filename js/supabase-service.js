@@ -1,13 +1,17 @@
 // Supabase服务层 - 替代传统后端API
-import { supabase, TABLES, handleSupabaseError } from '../config/supabase.js'
+// 为兼容原生站点，将服务导出到全局对象
+
+// 从配置中获取常量
+const _TABLES = window.SupabaseConfig.TABLES;
+const _handleSupabaseError = window.SupabaseConfig.handleSupabaseError;
 
 // 分类服务
-export class CategoryService {
+class CategoryService {
   // 获取所有分类
   static async getAll() {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.CATEGORIES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.CATEGORIES)
         .select('*')
         .order('created_at', { ascending: false })
       
@@ -16,7 +20,7 @@ export class CategoryService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取分类列表') 
+        message: _handleSupabaseError(error, '获取分类列表') 
       }
     }
   }
@@ -24,8 +28,8 @@ export class CategoryService {
   // 获取单个分类
   static async getById(id) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.CATEGORIES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.CATEGORIES)
         .select('*')
         .eq('id', id)
         .single()
@@ -35,7 +39,7 @@ export class CategoryService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取分类详情') 
+        message: _handleSupabaseError(error, '获取分类详情') 
       }
     }
   }
@@ -43,8 +47,8 @@ export class CategoryService {
   // 创建分类
   static async create(categoryData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.CATEGORIES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.CATEGORIES)
         .insert([{
           name: categoryData.name,
           description: categoryData.description || '',
@@ -59,7 +63,7 @@ export class CategoryService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '创建分类') 
+        message: _handleSupabaseError(error, '创建分类') 
       }
     }
   }
@@ -67,8 +71,8 @@ export class CategoryService {
   // 更新分类
   static async update(id, categoryData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.CATEGORIES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.CATEGORIES)
         .update({
           name: categoryData.name,
           description: categoryData.description || '',
@@ -84,7 +88,7 @@ export class CategoryService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '更新分类') 
+        message: _handleSupabaseError(error, '更新分类') 
       }
     }
   }
@@ -93,8 +97,8 @@ export class CategoryService {
   static async delete(id) {
     try {
       // 检查是否有景点使用此分类
-      const { data: attractions } = await supabase
-        .from(TABLES.ATTRACTIONS)
+      const { data: attractions } = await window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .select('id')
         .eq('category_id', id)
         .limit(1)
@@ -106,8 +110,8 @@ export class CategoryService {
         }
       }
 
-      const { error } = await supabase
-        .from(TABLES.CATEGORIES)
+      const { error } = await window.supabaseClient
+        .from(_TABLES.CATEGORIES)
         .delete()
         .eq('id', id)
       
@@ -116,19 +120,19 @@ export class CategoryService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '删除分类') 
+        message: _handleSupabaseError(error, '删除分类') 
       }
     }
   }
 }
 
 // 景点服务
-export class AttractionService {
+class AttractionService {
   // 获取所有景点
   static async getAll(filters = {}) {
     try {
-      let query = supabase
-        .from(TABLES.ATTRACTIONS)
+      let query = window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .select(`
           *,
           categories (
@@ -154,7 +158,7 @@ export class AttractionService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取景点列表') 
+        message: _handleSupabaseError(error, '获取景点列表') 
       }
     }
   }
@@ -162,8 +166,8 @@ export class AttractionService {
   // 获取单个景点
   static async getById(id) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ATTRACTIONS)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .select(`
           *,
           categories (
@@ -179,7 +183,7 @@ export class AttractionService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取景点详情') 
+        message: _handleSupabaseError(error, '获取景点详情') 
       }
     }
   }
@@ -187,8 +191,8 @@ export class AttractionService {
   // 创建景点
   static async create(attractionData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ATTRACTIONS)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .insert([{
           ...attractionData,
           created_at: new Date().toISOString()
@@ -201,7 +205,7 @@ export class AttractionService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '创建景点') 
+        message: _handleSupabaseError(error, '创建景点') 
       }
     }
   }
@@ -209,8 +213,8 @@ export class AttractionService {
   // 更新景点
   static async update(id, attractionData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ATTRACTIONS)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .update({
           ...attractionData,
           updated_at: new Date().toISOString()
@@ -224,7 +228,7 @@ export class AttractionService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '更新景点') 
+        message: _handleSupabaseError(error, '更新景点') 
       }
     }
   }
@@ -232,8 +236,8 @@ export class AttractionService {
   // 删除景点
   static async delete(id) {
     try {
-      const { error } = await supabase
-        .from(TABLES.ATTRACTIONS)
+      const { error } = await window.supabaseClient
+        .from(_TABLES.ATTRACTIONS)
         .delete()
         .eq('id', id)
       
@@ -242,19 +246,19 @@ export class AttractionService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '删除景点') 
+        message: _handleSupabaseError(error, '删除景点') 
       }
     }
   }
 }
 
 // 路线服务
-export class RouteService {
+class RouteService {
   // 获取所有路线
   static async getAll() {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ROUTES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ROUTES)
         .select(`
           *,
           route_attractions (
@@ -274,7 +278,7 @@ export class RouteService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取路线列表') 
+        message: _handleSupabaseError(error, '获取路线列表') 
       }
     }
   }
@@ -282,8 +286,8 @@ export class RouteService {
   // 获取单个路线
   static async getById(id) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ROUTES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ROUTES)
         .select(`
           *,
           route_attractions (
@@ -305,19 +309,19 @@ export class RouteService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取路线详情') 
+        message: _handleSupabaseError(error, '获取路线详情') 
       }
     }
   }
 }
 
 // 文章服务
-export class ArticleService {
+class ArticleService {
   // 获取所有文章
   static async getAll(filters = {}) {
     try {
-      let query = supabase
-        .from(TABLES.ARTICLES)
+      let query = window.supabaseClient
+        .from(_TABLES.ARTICLES)
         .select(`
           *,
           categories (
@@ -343,7 +347,7 @@ export class ArticleService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取文章列表') 
+        message: _handleSupabaseError(error, '获取文章列表') 
       }
     }
   }
@@ -351,8 +355,8 @@ export class ArticleService {
   // 获取单个文章
   static async getById(id) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ARTICLES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ARTICLES)
         .select(`
           *,
           categories (
@@ -368,7 +372,7 @@ export class ArticleService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取文章详情') 
+        message: _handleSupabaseError(error, '获取文章详情') 
       }
     }
   }
@@ -376,8 +380,8 @@ export class ArticleService {
   // 创建文章
   static async create(articleData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ARTICLES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ARTICLES)
         .insert([{
           ...articleData,
           created_at: new Date().toISOString()
@@ -390,7 +394,7 @@ export class ArticleService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '创建文章') 
+        message: _handleSupabaseError(error, '创建文章') 
       }
     }
   }
@@ -398,8 +402,8 @@ export class ArticleService {
   // 更新文章
   static async update(id, articleData) {
     try {
-      const { data, error } = await supabase
-        .from(TABLES.ARTICLES)
+      const { data, error } = await window.supabaseClient
+        .from(_TABLES.ARTICLES)
         .update({
           ...articleData,
           updated_at: new Date().toISOString()
@@ -413,7 +417,7 @@ export class ArticleService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '更新文章') 
+        message: _handleSupabaseError(error, '更新文章') 
       }
     }
   }
@@ -421,8 +425,8 @@ export class ArticleService {
   // 删除文章
   static async delete(id) {
     try {
-      const { error } = await supabase
-        .from(TABLES.ARTICLES)
+      const { error } = await window.supabaseClient
+        .from(_TABLES.ARTICLES)
         .delete()
         .eq('id', id)
       
@@ -431,22 +435,22 @@ export class ArticleService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '删除文章') 
+        message: _handleSupabaseError(error, '删除文章') 
       }
     }
   }
 }
 
 // 统计服务
-export class StatsService {
+class StatsService {
   // 获取仪表盘统计数据
   static async getDashboardStats() {
     try {
       const [categoriesResult, attractionsResult, routesResult, articlesResult] = await Promise.all([
-        supabase.from(TABLES.CATEGORIES).select('id', { count: 'exact' }),
-        supabase.from(TABLES.ATTRACTIONS).select('id', { count: 'exact' }),
-        supabase.from(TABLES.ROUTES).select('id', { count: 'exact' }),
-        supabase.from(TABLES.ARTICLES).select('id', { count: 'exact' })
+        window.supabaseClient.from(_TABLES.CATEGORIES).select('id', { count: 'exact' }),
+        window.supabaseClient.from(_TABLES.ATTRACTIONS).select('id', { count: 'exact' }),
+        window.supabaseClient.from(_TABLES.ROUTES).select('id', { count: 'exact' }),
+        window.supabaseClient.from(_TABLES.ARTICLES).select('id', { count: 'exact' })
       ])
 
       return {
@@ -461,18 +465,18 @@ export class StatsService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '获取统计数据') 
+        message: _handleSupabaseError(error, '获取统计数据') 
       }
     }
   }
 }
 
 // 认证服务
-export class AuthService {
+class AuthService {
   // 管理员登录
   static async signIn(email, password) {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await window.supabaseClient.auth.signInWithPassword({
         email,
         password
       })
@@ -480,14 +484,14 @@ export class AuthService {
       if (error) throw error
       
       // 检查用户是否是管理员
-      const { data: adminUser } = await supabase
-        .from(TABLES.ADMIN_USERS)
+      const { data: adminUser } = await window.supabaseClient
+        .from(_TABLES.ADMIN_USERS)
         .select('*')
         .eq('user_id', data.user.id)
         .single()
       
       if (!adminUser) {
-        await supabase.auth.signOut()
+        await window.supabaseClient.auth.signOut()
         throw new Error('您没有管理员权限')
       }
       
@@ -499,7 +503,7 @@ export class AuthService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '登录') 
+        message: _handleSupabaseError(error, '登录') 
       }
     }
   }
@@ -507,14 +511,14 @@ export class AuthService {
   // 检查管理员权限
   static async checkAdminPermission() {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user } } = await window.supabaseClient.auth.getUser()
       
       if (!user) {
         return { success: false, message: '未登录' }
       }
       
-      const { data: adminUser } = await supabase
-        .from(TABLES.ADMIN_USERS)
+      const { data: adminUser } = await window.supabaseClient
+        .from(_TABLES.ADMIN_USERS)
         .select('*')
         .eq('user_id', user.id)
         .single()
@@ -527,8 +531,18 @@ export class AuthService {
     } catch (error) {
       return { 
         success: false, 
-        message: handleSupabaseError(error, '权限检查') 
+        message: _handleSupabaseError(error, '权限检查') 
       }
     }
   }
+}
+
+// 导出到全局对象（兼容原生站点）
+if (typeof window !== 'undefined') {
+  window.CategoryService = CategoryService;
+  window.AttractionService = AttractionService;
+  window.RouteService = RouteService;
+  window.ArticleService = ArticleService;
+  window.StatsService = StatsService;
+  window.AuthService = AuthService;
 }
