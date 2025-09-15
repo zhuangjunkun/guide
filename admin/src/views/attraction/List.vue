@@ -27,24 +27,6 @@
             />
           </el-form-item>
           
-          <el-form-item label="分类">
-            <el-select v-model="filterForm.category_id" placeholder="请选择分类" clearable>
-              <el-option 
-                v-for="category in categories" 
-                :key="category.id" 
-                :label="category.name" 
-                :value="category.id" 
-              />
-            </el-select>
-          </el-form-item>
-          
-          <el-form-item label="状态">
-            <el-select v-model="filterForm.status" placeholder="请选择状态" clearable>
-              <el-option label="启用" value="true" />
-              <el-option label="禁用" value="false" />
-            </el-select>
-          </el-form-item>
-          
           <el-form-item>
             <el-button type="primary" @click="handleSearch">搜索</el-button>
             <el-button @click="handleReset">重置</el-button>
@@ -61,27 +43,8 @@
       >
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="景点名称" />
-        <el-table-column prop="category_name" label="分类" width="100" />
-        <el-table-column prop="address" label="地址" />
-        <el-table-column prop="rating" label="评分" width="100">
-          <template #default="scope">
-            <el-rate 
-              v-model="scope.row.rating" 
-              disabled 
-              show-score 
-              text-color="#ff9900" 
-              score-template="{value}"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
-          <template #default="scope">
-            <el-tag :type="scope.row.status ? 'success' : 'danger'">
-              {{ scope.row.status ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="created_at" label="创建时间" width="180" />
+        <!-- <el-table-column prop="description" label="描述" width="100" show-tool-tips /> -->
+        <el-table-column prop="created_at" label="创建时间" width="180"  />
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="scope">
             <el-button 

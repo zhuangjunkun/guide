@@ -22,6 +22,7 @@
           :image-url="mapImageUrl"
           :markers="attractions"
           @map-click="handleMapClick"
+          @marker-drag-end="handleMarkerDrag"
         />
         <el-empty v-else description="地图图片加载失败"></el-empty>
       </div>
@@ -66,7 +67,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessage, ElNotification } from 'element-plus';
-import { QuestionFilled } from '@element-plus/icons-vue';
+import { Delete, QuestionFilled } from '@element-plus/icons-vue';
 import ImageMapEditor from '@/components/ImageMapEditor.vue';
 import FormDialog from '@/components/common/FormDialog.vue';
 import { AttractionService } from '@/services/attraction.js';
@@ -113,17 +114,24 @@ function handleMapClick(coords) {
 }
 
 async function handleMarkerDrag(updateInfo) {
-  const { id, longitude, latitude } = updateInfo;
+  const { id, map_x, map_y } = updateInfo;
   
   const marker = attractions.value.find(a => a.id === id);
   if (!marker) return;
 
-  const originalPosition = { longitude: marker.longitude, latitude: marker.latitude };
+  const originalPosition = { 
+    map_x: marker.map_x, 
+    map_y: marker.map_y,
+    longitude: marker.longitude,
+    latitude: marker.latitude
+  };
   
-  marker.longitude = longitude;
-  marker.latitude = latitude;
-
-  const { success, message } = await AttractionService.update(id, { longitude, latitude });
+  // 更新本地数据
+  marker.map_x = map_x;
+  marker.map_y = map_y;
+  let info = JSON.parse(JSON.stringify(updateInfo))
+  delete info.id
+  const { success, message } = await AttractionService.update(id, info);
 
   if (success) {
     ElNotification({
@@ -133,6 +141,9 @@ async function handleMarkerDrag(updateInfo) {
       duration: 2000,
     });
   } else {
+    // 恢复原始数据
+    marker.map_x = originalPosition.map_x;
+    marker.map_y = originalPosition.map_y;
     marker.longitude = originalPosition.longitude;
     marker.latitude = originalPosition.latitude;
     ElMessage.error(message || '更新景点位置失败');

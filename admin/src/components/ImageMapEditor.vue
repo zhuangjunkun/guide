@@ -245,7 +245,7 @@ export default {
           marker.style.left = `${markerData.map_x * 100}%`;
           marker.style.top = `${markerData.map_y * 100}%`;
           marker.style.transform = 'translate(-50%, -50%)';
-          marker.style.cursor = 'pointer';
+          marker.style.cursor = 'move';
           marker.style.zIndex = '10';
           
           // 标记样式
@@ -266,9 +266,138 @@ export default {
             this.$emit('marker-click', markerData);
           });
 
+          // 添加拖拽功能
+          this.setupMarkerDrag(marker, markerData);
+
           markersContainer.appendChild(marker);
         }
       });
+    },
+
+    setupMarkerDrag(marker, markerData) {
+      let isDragging = false;
+      let startX = 0;
+      let startY = 0;
+      let startLeft = 0;
+      let startTop = 0;
+
+      const handleMouseDown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = true;
+        
+        const rect = marker.getBoundingClientRect();
+        const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+        
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = (rect.left - containerRect.left + rect.width / 2) / containerRect.width;
+        startTop = (rect.top - containerRect.top + rect.height / 2) / containerRect.height;
+        
+        marker.style.cursor = 'grabbing';
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+      };
+
+      const handleMouseMove = (e) => {
+        if (!isDragging) return;
+        
+        const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+        const deltaX = (e.clientX - startX) / containerRect.width;
+        const deltaY = (e.clientY - startY) / containerRect.height;
+        
+        const newLeft = Math.max(0, Math.min(1, startLeft + deltaX));
+        const newTop = Math.max(0, Math.min(1, startTop + deltaY));
+        
+        marker.style.left = `${newLeft * 100}%`;
+        marker.style.top = `${newTop * 100}%`;
+      };
+
+      const handleMouseUp = (e) => {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        marker.style.cursor = 'move';
+        
+        const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+        const rect = marker.getBoundingClientRect();
+        
+        const map_x = (rect.left - containerRect.left + rect.width / 2) / containerRect.width;
+        const map_y = (rect.top - containerRect.top + rect.height / 2) / containerRect.height;
+        
+        // 发出更新事件
+        this.$emit('marker-drag-end', {
+          ...markerData,
+          map_x: Math.max(0, Math.min(1, map_x)),
+          map_y: Math.max(0, Math.min(1, map_y))
+        });
+        
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+
+      // 触摸事件处理
+      const handleTouchStart = (e) => {
+        if (e.touches.length === 1) {
+          e.preventDefault();
+          e.stopPropagation();
+          isDragging = true;
+          
+          const rect = marker.getBoundingClientRect();
+          const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+          
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+          startLeft = (rect.left - containerRect.left + rect.width / 2) / containerRect.width;
+          startTop = (rect.top - containerRect.top + rect.height / 2) / containerRect.height;
+          
+          marker.style.cursor = 'grabbing';
+          document.addEventListener('touchmove', handleTouchMove, { passive: false });
+          document.addEventListener('touchend', handleTouchEnd);
+        }
+      };
+
+      const handleTouchMove = (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        
+        e.preventDefault();
+        const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+        const deltaX = (e.touches[0].clientX - startX) / containerRect.width;
+        const deltaY = (e.touches[0].clientY - startY) / containerRect.height;
+        
+        const newLeft = Math.max(0, Math.min(1, startLeft + deltaX));
+        const newTop = Math.max(0, Math.min(1, startTop + deltaY));
+        
+        marker.style.left = `${newLeft * 100}%`;
+        marker.style.top = `${newTop * 100}%`;
+      };
+
+      const handleTouchEnd = (e) => {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        marker.style.cursor = 'move';
+        
+        const containerRect = this.$refs.markersContainer.getBoundingClientRect();
+        const rect = marker.getBoundingClientRect();
+        
+        const map_x = (rect.left - containerRect.left + rect.width / 2) / containerRect.width;
+        const map_y = (rect.top - containerRect.top + rect.height / 2) / containerRect.height;
+        
+        // 发出更新事件
+        this.$emit('marker-drag-end', {
+          ...markerData,
+          map_x: Math.max(0, Math.min(1, map_x)),
+          map_y: Math.max(0, Math.min(1, map_y))
+        });
+        
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+
+      // 添加事件监听器
+      marker.addEventListener('mousedown', handleMouseDown);
+      marker.addEventListener('touchstart', handleTouchStart, { passive: false });
     },
   },
 
