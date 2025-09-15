@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 接口测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Supabase 接口测试页面</h1>
+    
+    <div class="test-section">
+        <h3>1. 连接测试</h3>
+        <button onclick="testConnection()">测试 Supabase 连接</button>
+        <div id="connection-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. 分类管理测试</h3>
+        <button onclick="testCategories()">获取分类列表</button>
+        <button onclick="createTestCategory()">创建测试分类</button>
+        <div id="categories-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. 景点管理测试</h3>
+        <button onclick="testAttractions()">获取景点列表</button>
+        <button onclick="createTestAttraction()">创建测试景点</button>
+        <div id="attractions-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. 文章管理测试</h3>
+        <button onclick="testArticles()">获取文章列表</button>
+        <button onclick="createTestArticle()">创建测试文章</button>
+        <div id="articles-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. 路线管理测试</h3>
+        <button onclick="testRoutes()">获取路线列表</button>
+        <button onclick="createTestRoute()">创建测试路线</button>
+        <div id="routes-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>6. 统计数据测试</h3>
+        <button onclick="testStats()">获取统计数据</button>
+        <div id="stats-result" class="result"></div>
+    </div>
+
+    <script>
+        // Supabase 配置
+        const supabaseUrl = 'https://xaoxaodcqcqjhydkrnfd.supabase.co'
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhhb3hhb2RjcWNxamh5ZGtybmZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY2OTAxNjksImV4cCI6MjA3MjI2NjE2OX0.t01Dyealn85iCLvv26iAm-G3UJbqj8v5WWrG1sUVmMY'
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey)
+
+        function showResult(elementId, data, isError = false) {
+            const element = document.getElementById(elementId)
+            element.textContent = JSON.stringify(data, null, 2)
+            element.className = `result ${isError ? 'error' : 'success'}`
+        }
+
+        async function testConnection() {
+            try {
+                const { data, error } = await supabase.from('categories').select('count', { count: 'exact' })
+                if (error) throw error
+                showResult('connection-result', { 
+                    status: '连接成功', 
+                    message: '可以正常访问数据库',
+                    count: data.length 
+                })
+            } catch (error) {
+                showResult('connection-result', { 
+                    status: '连接失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function testCategories() {
+            try {
+                const { data, error } = await supabase
+                    .from('categories')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5)
+                
+                if (error) throw error
+                showResult('categories-result', { 
+                    status: '获取成功', 
+                    count: data.length,
+                    data: data 
+                })
+            } catch (error) {
+                showResult('categories-result', { 
+                    status: '获取失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function createTestCategory() {
+            try {
+                const testCategory = {
+                    name: '测试分类_' + Date.now(),
+                    slug: 'test-category-' + Date.now(),
+                    description: '这是一个测试分类',
+                    is_active: true
+                }
+
+                const { data, error } = await supabase
+                    .from('categories')
+                    .insert([testCategory])
+                    .select()
+                    .single()
+                
+                if (error) throw error
+                showResult('categories-result', { 
+                    status: '创建成功', 
+                    data: data 
+                })
+            } catch (error) {
+                showResult('categories-result', { 
+                    status: '创建失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function testAttractions() {
+            try {
+                const { data, error } = await supabase
+                    .from('attractions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5)
+                
+                if (error) throw error
+                showResult('attractions-result', { 
+                    status: '获取成功', 
+                    count: data.length,
+                    data: data 
+                })
+            } catch (error) {
+                showResult('attractions-result', { 
+                    status: '获取失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function createTestAttraction() {
+            try {
+                const testAttraction = {
+                    name: '测试景点_' + Date.now(),
+                    description: '这是一个测试景点',
+                    latitude: 30.2741,
+                    longitude: 120.1551,
+                    category: '测试分类',
+                    is_active: true
+                }
+
+                const { data, error } = await supabase
+                    .from('attractions')
+                    .insert([testAttraction])
+                    .select()
+                    .single()
+                
+                if (error) throw error
+                showResult('attractions-result', { 
+                    status: '创建成功', 
+                    data: data 
+                })
+            } catch (error) {
+                showResult('attractions-result', { 
+                    status: '创建失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function testArticles() {
+            try {
+                const { data, error } = await supabase
+                    .from('articles')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5)
+                
+                if (error) throw error
+                showResult('articles-result', { 
+                    status: '获取成功', 
+                    count: data.length,
+                    data: data 
+                })
+            } catch (error) {
+                showResult('articles-result', { 
+                    status: '获取失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function createTestArticle() {
+            try {
+                const testArticle = {
+                    title: '测试文章_' + Date.now(),
+                    slug: 'test-article-' + Date.now(),
+                    summary: '这是一个测试文章摘要',
+                    content: '这是测试文章的内容...',
+                    author: '测试作者',
+                    is_published: true
+                }
+
+                const { data, error } = await supabase
+                    .from('articles')
+                    .insert([testArticle])
+                    .select()
+                    .single()
+                
+                if (error) throw error
+                showResult('articles-result', { 
+                    status: '创建成功', 
+                    data: data 
+                })
+            } catch (error) {
+                showResult('articles-result', { 
+                    status: '创建失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function testRoutes() {
+            try {
+                const { data, error } = await supabase
+                    .from('routes')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(5)
+                
+                if (error) throw error
+                showResult('routes-result', { 
+                    status: '获取成功', 
+                    count: data.length,
+                    data: data 
+                })
+            } catch (error) {
+                showResult('routes-result', { 
+                    status: '获取失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function createTestRoute() {
+            try {
+                const testRoute = {
+                    name: '测试路线_' + Date.now(),
+                    description: '这是一个测试路线',
+                    duration: '1天',
+                    difficulty: 'easy',
+                    highlights: ['测试景点1', '测试景点2'],
+                    attraction_ids: [1, 2],
+                    status: 1
+                }
+
+                const { data, error } = await supabase
+                    .from('routes')
+                    .insert([testRoute])
+                    .select()
+                    .single()
+                
+                if (error) throw error
+                showResult('routes-result', { 
+                    status: '创建成功', 
+                    data: data 
+                })
+            } catch (error) {
+                showResult('routes-result', { 
+                    status: '创建失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        async function testStats() {
+            try {
+                const [categoriesResult, attractionsResult, articlesResult, routesResult] = await Promise.all([
+                    supabase.from('categories').select('id', { count: 'exact' }),
+                    supabase.from('attractions').select('id', { count: 'exact' }),
+                    supabase.from('articles').select('id', { count: 'exact' }),
+                    supabase.from('routes').select('id', { count: 'exact' })
+                ])
+
+                const stats = {
+                    categories: categoriesResult.count || 0,
+                    attractions: attractionsResult.count || 0,
+                    articles: articlesResult.count || 0,
+                    routes: routesResult.count || 0
+                }
+
+                showResult('stats-result', { 
+                    status: '获取成功', 
+                    stats: stats 
+                })
+            } catch (error) {
+                showResult('stats-result', { 
+                    status: '获取失败', 
+                    error: error.message 
+                }, true)
+            }
+        }
+
+        // 页面加载时自动测试连接
+        window.onload = function() {
+            testConnection()
+        }
+    </script>
+</body>
+</html>

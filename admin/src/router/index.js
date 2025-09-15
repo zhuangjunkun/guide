@@ -11,9 +11,6 @@ import AttractionEdit from '@/views/attraction/Edit.vue'
 import ArticleList from '@/views/article/List.vue'
 import ArticleCreate from '@/views/article/Create.vue'
 import ArticleEdit from '@/views/article/Edit.vue'
-import RouteList from '@/views/route/List.vue'
-import RouteCreate from '@/views/route/Create.vue'
-import RouteEdit from '@/views/route/Edit.vue'
 import MapConfig from '@/views/map/Config.vue'
 
 const routes = [
@@ -79,22 +76,6 @@ const routes = [
         path: 'articles/edit/:id',
         name: 'ArticleEdit',
         component: ArticleEdit,
-        props: true
-      },
-      {
-        path: 'routes',
-        name: 'RouteList',
-        component: RouteList
-      },
-      {
-        path: 'routes/create',
-        name: 'RouteCreate',
-        component: RouteCreate
-      },
-      {
-        path: 'routes/edit/:id',
-        name: 'RouteEdit',
-        component: RouteEdit,
         props: true
       },
       {

@@ -1,0 +1,68 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景色 -->
+  <rect width="100%" height="100%" fill="#e8f4f8"/>
+  
+  <!-- 网格线 -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#c0d8e0" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#grid)" />
+  
+  <!-- 模拟道路 -->
+  <path d="M 100 50 L 700 50" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 100 150 L 700 150" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 100 250 L 700 250" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 100 350 L 700 350" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 100 450 L 700 450" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 100 550 L 700 550" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  
+  <path d="M 50 100 L 50 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 150 100 L 150 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 250 100 L 250 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 350 100 L 350 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 450 100 L 450 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 550 100 L 550 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 650 100 L 650 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 750 100 L 750 500" stroke="#888" stroke-width="8" stroke-linecap="round"/>
+  
+  <!-- 模拟建筑物 -->
+  <rect x="120" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  <rect x="220" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  <rect x="320" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  <rect x="420" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  <rect x="520" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  <rect x="620" y="70" width="60" height="60" fill="#4a90e2" rx="5"/>
+  
+  <rect x="120" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  <rect x="220" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  <rect x="320" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  <rect x="420" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  <rect x="520" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  <rect x="620" y="170" width="60" height="60" fill="#7b68ee" rx="5"/>
+  
+  <rect x="120" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  <rect x="220" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  <rect x="320" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  <rect x="420" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  <rect x="520" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  <rect x="620" y="270" width="60" height="60" fill="#50c878" rx="5"/>
+  
+  <rect x="120" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  <rect x="220" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  <rect x="320" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  <rect x="420" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  <rect x="520" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  <rect x="620" y="370" width="60" height="60" fill="#ffa500" rx="5"/>
+  
+  <rect x="120" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  <rect x="220" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  <rect x="320" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  <rect x="420" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  <rect x="520" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  <rect x="620" y="470" width="60" height="60" fill="#ff6347" rx="5"/>
+  
+  <!-- 标题 -->
+  <text x="400" y="30" font-family="Arial" font-size="20" text-anchor="middle" fill="#333">H5可视化地图配置示例</text>
+</svg>

@@ -1,3 +1,5 @@
+import { AttractionService } from './supabase-service.js';
+
 // 地图页面逻辑
 class MapApp {
     constructor() {
@@ -12,45 +14,43 @@ class MapApp {
         this.lastX = 0;
         this.lastY = 0;
         
-        this.markers = {
-            1: {
-                id: 1,
-                name: '西湖',
-                description: '西湖，位于浙江省杭州市西湖区龙井路1号，杭州市区西部，景区总面积49平方千米，汇水面积21.22平方千米，湖面面积6.38平方千米。',
-                image: 'https://picsum.photos/300/150?random=11',
-                coordinates: { lat: 30.2741, lng: 120.1551 }
-            },
-            2: {
-                id: 2,
-                name: '灵隐寺',
-                description: '灵隐寺，又名云林寺，位于浙江省杭州市，背靠北高峰，面朝飞来峰，始建于东晋咸和元年（326年），占地面积约87000平方米。',
-                image: 'https://picsum.photos/300/150?random=12',
-                coordinates: { lat: 30.2408, lng: 120.1014 }
-            },
-            3: {
-                id: 3,
-                name: '宋城',
-                description: '杭州宋城景区是中国大陆人气最旺的主题公园，年游客逾700万人次。秉承"建筑为形，文化为魂"的经营理念。',
-                image: 'https://picsum.photos/300/150?random=13',
-                coordinates: { lat: 30.1957, lng: 120.0778 }
-            },
-            4: {
-                id: 4,
-                name: '河坊街',
-                description: '河坊街位于吴山脚下，是清河坊的一部分，属于杭州老城区，旧时，与中山中路相交得"清河坊四拐角"，自民国以来，分别为孔凤春香粉店、宓大昌旱烟、万隆火腿店、张允升帽庄四家各踞一角，成为当时远近闻名得区片。',
-                image: 'https://picsum.photos/300/150?random=14',
-                coordinates: { lat: 30.2467, lng: 120.1707 }
-            }
-        };
-        
-        this.init();
+        this.markers = {}; // 数据将从API加载
+        this.currentMarker = null;
     }
 
-    init() {
+    async init() {
+        await this.loadMarkers();
+        this.renderMarkers();
         this.bindEvents();
         this.initMap();
         // 初始化标记缩放
         this.updateMarkerScale();
+    }
+    
+    async loadMarkers() {
+        const response = await AttractionService.getAll();
+        if (response.success && response.data) {
+            this.markers = response.data.reduce((acc, attraction) => {
+                // 假设 location 格式为 "lng,lat"
+                const [lng, lat] = attraction.location 
+                    ? attraction.location.split(',').map(Number) 
+                    : [0, 0];
+
+                acc[attraction.id] = {
+                    id: attraction.id,
+                    name: attraction.name,
+                    description: attraction.description,
+                    image: (attraction.images && attraction.images.length > 0) 
+                        ? attraction.images[0] 
+                        : `https://picsum.photos/300/150?random=${attraction.id}`,
+                    coordinates: { lat, lng }
+                };
+                return acc;
+            }, {});
+        } else {
+            console.error('Failed to load attractions:', response.message);
+            alert('景点数据加载失败，请稍后重试。');
+        }
     }
 
     bindEvents() {
@@ -75,45 +75,37 @@ class MapApp {
         document.getElementById('zoomOutBtn').addEventListener('click', () => this.zoomOut());
         document.getElementById('locateBtn').addEventListener('click', () => this.resetView());
         
-        // 标记点击事件
-        const markers = document.querySelectorAll('.marker');
-        markers.forEach(marker => {
-            // 使用 touchend 和 click 事件
-            marker.addEventListener('click', (e) => {
+        // 标记点击事件 (使用事件委托)
+        mapContent.addEventListener('click', (e) => {
+            const marker = e.target.closest('.marker');
+            if (marker && !this.dragStarted) {
                 e.stopPropagation();
-                e.preventDefault();
-                
-                // 如果正在拖拽，不触发点击
-                if (this.dragStarted) {
-                    return;
-                }
-                
                 const markerId = marker.dataset.id;
                 this.showMarkerPopup(markerId);
-            });
-            
-            // 添加触摸事件处理
-            marker.addEventListener('touchend', (e) => {
+            }
+        });
+
+        mapContent.addEventListener('touchend', (e) => {
+            const marker = e.target.closest('.marker');
+            if (marker && !this.dragStarted) {
                 e.stopPropagation();
-                e.preventDefault();
-                
-                // 如果正在拖拽，不触发点击
-                if (this.dragStarted) {
-                    return;
-                }
-                
+                e.preventDefault(); // 防止触发click
                 const markerId = marker.dataset.id;
                 this.showMarkerPopup(markerId);
-            });
-            
-            // 防止标记上的触摸事件冒泡
-            marker.addEventListener('touchstart', (e) => {
+            }
+        });
+
+        // 防止在标记上拖动时移动地图
+        mapContent.addEventListener('touchstart', (e) => {
+            if (e.target.closest('.marker')) {
                 e.stopPropagation();
-            });
-            
-            marker.addEventListener('touchmove', (e) => {
+            }
+        });
+
+        mapContent.addEventListener('touchmove', (e) => {
+            if (e.target.closest('.marker')) {
                 e.stopPropagation();
-            });
+            }
         });
         
         // 弹窗事件
@@ -146,6 +138,64 @@ class MapApp {
 
     initMap() {
         this.updateTransform();
+    }
+
+    renderMarkers() {
+        const mapContent = document.getElementById('mapContent');
+        if (!mapContent) return;
+
+        // 清除旧的静态标记（如果存在）
+        const existingMarkers = mapContent.querySelectorAll('.marker');
+        existingMarkers.forEach(m => m.remove());
+
+        for (const id in this.markers) {
+            const markerData = this.markers[id];
+            const { lat, lng } = markerData.coordinates;
+
+            // 跳过无效坐标的标记
+            if (typeof lat !== 'number' || typeof lng !== 'number' || lat === 0 || lng === 0) {
+                console.warn(`Skipping marker "${markerData.name}" due to invalid coordinates.`);
+                continue;
+            }
+
+            const position = this.convertGeoToPixels(lat, lng);
+
+            const markerElement = document.createElement('div');
+            markerElement.className = 'marker';
+            markerElement.dataset.id = id;
+            markerElement.style.left = `${position.x}px`;
+            markerElement.style.top = `${position.y}px`;
+
+            const markerLabel = document.createElement('span');
+            markerLabel.textContent = markerData.name;
+            markerElement.appendChild(markerLabel);
+
+            mapContent.appendChild(markerElement);
+        }
+    }
+
+    // 将地理坐标转换为像素坐标
+    // 注意：这是一个占位符实现。您需要根据您的地图图像和地理边界进行调整。
+    convertGeoToPixels(lat, lng) {
+        // 示例边界 - 需要替换为实际值
+        const mapBounds = {
+            width: 3000,  // 地图图像宽度（像素）
+            height: 2250, // 地图图像高度（像素）
+            geo: {
+                top: 30.33,    // 地图顶部的纬度
+                bottom: 30.18, // 地图底部的纬度
+                left: 120.05,  // 地图左侧的经度
+                right: 120.25  // 地图右侧的经度
+            }
+        };
+
+        const lngRange = mapBounds.geo.right - mapBounds.geo.left;
+        const latRange = mapBounds.geo.top - mapBounds.geo.bottom;
+
+        const x = ((lng - mapBounds.geo.left) / lngRange) * mapBounds.width;
+        const y = ((mapBounds.geo.top - lat) / latRange) * mapBounds.height;
+
+        return { x, y };
     }
 
     // 鼠标事件处理
@@ -388,5 +438,7 @@ class MapApp {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', () => {
-    new MapApp();
+    const app = new MapApp();
+    app.init();
+    console.log('123',app)
 });

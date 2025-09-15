@@ -1,0 +1,14 @@
+{
+  "name": "guide-database-seed",
+  "version": "1.0.0",
+  "description": "Database seeding scripts for the guide application",
+  "main": "seed-database.js",
+  "scripts": {
+    "seed": "node seed-database.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "author": "Guide App",
+  "license": "MIT"
+}

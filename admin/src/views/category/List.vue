@@ -29,8 +29,8 @@
           
           <el-form-item label="状态">
             <el-select v-model="filterForm.status" placeholder="请选择状态" clearable>
-              <el-option label="启用" value="enabled" />
-              <el-option label="禁用" value="disabled" />
+              <el-option label="启用" value="true" />
+              <el-option label="禁用" value="false" />
             </el-select>
           </el-form-item>
           
@@ -51,6 +51,7 @@
         <el-table-column prop="id" label="ID" width="80" />
         <el-table-column prop="name" label="分类名称" />
         <el-table-column prop="description" label="描述" />
+        <el-table-column prop="sort_order" label="排序" width="100" />
         <el-table-column prop="status" label="状态" width="100">
           <template #default="scope">
             <el-tag :type="scope.row.status ? 'success' : 'danger'">
@@ -99,6 +100,7 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { CategoryService } from '@/services/category'
 
 export default {
   name: 'CategoryList',
@@ -131,47 +133,31 @@ export default {
       loading.value = true
       
       try {
-        // 模拟数据
-        tableData.value = [
-          {
-            id: 1,
-            name: '景点',
-            description: '旅游景点分类',
-            status: true,
-            created_at: '2024-01-01 12:00:00'
-          },
-          {
-            id: 2,
-            name: '美食',
-            description: '美食推荐分类',
-            status: true,
-            created_at: '2024-01-02 12:00:00'
-          },
-          {
-            id: 3,
-            name: '住宿',
-            description: '住宿指南分类',
-            status: true,
-            created_at: '2024-01-03 12:00:00'
-          },
-          {
-            id: 4,
-            name: '购物',
-            description: '购物攻略分类',
-            status: false,
-            created_at: '2024-01-04 12:00:00'
-          },
-          {
-            id: 5,
-            name: '文化',
-            description: '文化体验分类',
-            status: true,
-            created_at: '2024-01-05 12:00:00'
-          }
-        ]
+        const filters = {}
+        if (filterForm.name) {
+          filters.name = filterForm.name
+        }
+        if (filterForm.status !== '') {
+          filters.is_active = filterForm.status === 'true'
+        }
         
-        pagination.total = tableData.value.length
+        const result = await CategoryService.getAll(filters, {
+          page: pagination.currentPage,
+          limit: pagination.pageSize
+        })
+        
+        if (result.success) {
+          tableData.value = result.data.map(item => ({
+            ...item,
+            status: item.is_active,
+            created_at: new Date(item.created_at).toLocaleString()
+          }))
+          pagination.total = result.total || result.data.length
+        } else {
+          ElMessage.error(result.message || '获取数据失败')
+        }
       } catch (error) {
+        console.error('获取数据失败:', error)
         ElMessage.error('获取数据失败: ' + error.message)
       } finally {
         loading.value = false
@@ -180,6 +166,7 @@ export default {
     
     // 搜索
     const handleSearch = () => {
+      pagination.currentPage = 1
       fetchData()
     }
     
@@ -187,12 +174,14 @@ export default {
     const handleReset = () => {
       filterForm.name = ''
       filterForm.status = ''
+      pagination.currentPage = 1
       fetchData()
     }
     
     // 分页变化
     const handleSizeChange = (val) => {
       pagination.pageSize = val
+      pagination.currentPage = 1
       fetchData()
     }
     
@@ -202,22 +191,31 @@ export default {
     }
     
     // 删除
-    const handleDelete = (row) => {
-      ElMessageBox.confirm(
-        `确定要删除分类 "${row.name}" 吗？`,
-        '确认删除',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
+    const handleDelete = async (row) => {
+      try {
+        await ElMessageBox.confirm(
+          `确定要删除分类 "${row.name}" 吗？`,
+          '确认删除',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+        
+        const result = await CategoryService.delete(row.id)
+        if (result.success) {
+          ElMessage.success('删除成功')
+          fetchData()
+        } else {
+          ElMessage.error(result.message || '删除失败')
         }
-      ).then(() => {
-        // 模拟删除操作
-        ElMessage.success('删除成功')
-        fetchData()
-      }).catch(() => {
-        // 用户取消删除
-      })
+      } catch (error) {
+        if (error !== 'cancel') {
+          console.error('删除失败:', error)
+          ElMessage.error('删除失败')
+        }
+      }
     }
     
     onMounted(() => {

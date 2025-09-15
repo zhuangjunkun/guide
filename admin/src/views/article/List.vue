@@ -29,9 +29,12 @@
           
           <el-form-item label="分类">
             <el-select v-model="filterForm.category_id" placeholder="请选择分类" clearable>
-              <el-option label="景点" value="1" />
-              <el-option label="美食" value="2" />
-              <el-option label="住宿" value="3" />
+              <el-option 
+                v-for="category in categories" 
+                :key="category.id" 
+                :label="category.name" 
+                :value="category.id" 
+              />
             </el-select>
           </el-form-item>
           
@@ -109,6 +112,8 @@ import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { ArticleService } from '@/services/article'
+import { CategoryService } from '@/services/category'
 
 export default {
   name: 'ArticleList',
@@ -137,53 +142,56 @@ export default {
       status: ''
     })
     
+    // 分类列表
+    const categories = ref([])
+    
+    // 获取分类数据
+    const fetchCategories = async () => {
+      try {
+        const result = await CategoryService.getAll()
+        if (result.success) {
+          categories.value = result.data
+        }
+      } catch (error) {
+        console.error('获取分类失败:', error)
+      }
+    }
+    
     // 获取数据
     const fetchData = async () => {
       loading.value = true
       
       try {
-        // 模拟数据
-        tableData.value = [
-          {
-            id: 1,
-            title: '西湖十景完整攻略，带你领略杭州最美风光',
-            category_name: '景点',
-            views: 1250,
-            likes: 89,
-            status: true,
-            created_at: '2024-01-01 12:00:00'
-          },
-          {
-            id: 2,
-            title: '杭州美食地图：本地人推荐的10家必吃餐厅',
-            category_name: '美食',
-            views: 2100,
-            likes: 156,
-            status: true,
-            created_at: '2024-01-02 12:00:00'
-          },
-          {
-            id: 3,
-            title: '杭州精品民宿推荐，体验不一样的住宿感受',
-            category_name: '住宿',
-            views: 890,
-            likes: 67,
-            status: true,
-            created_at: '2024-01-03 12:00:00'
-          },
-          {
-            id: 4,
-            title: '河坊街购物攻略：传统与现代的完美融合',
-            category_name: '购物',
-            views: 1560,
-            likes: 98,
-            status: false,
-            created_at: '2024-01-04 12:00:00'
-          }
-        ]
+        const filters = {}
+        if (filterForm.title) {
+          filters.title = filterForm.title
+        }
+        if (filterForm.category_id) {
+          filters.category_id = filterForm.category_id
+        }
+        if (filterForm.status) {
+          filters.is_published = filterForm.status === 'published'
+        }
         
-        pagination.total = tableData.value.length
+        const result = await ArticleService.getAll(filters, {
+          page: pagination.currentPage,
+          limit: pagination.pageSize
+        })
+        
+        if (result.success) {
+          // 处理数据格式，添加分类名称
+          tableData.value = result.data.map(item => ({
+            ...item,
+            category_name: categories.value.find(cat => cat.id === item.category_id)?.name || '未分类',
+            status: item.is_published,
+            created_at: new Date(item.created_at).toLocaleString()
+          }))
+          pagination.total = result.total || result.data.length
+        } else {
+          ElMessage.error(result.message || '获取数据失败')
+        }
       } catch (error) {
+        console.error('获取数据失败:', error)
         ElMessage.error('获取数据失败: ' + error.message)
       } finally {
         loading.value = false
@@ -215,25 +223,35 @@ export default {
     }
     
     // 删除
-    const handleDelete = (row) => {
-      ElMessageBox.confirm(
-        `确定要删除文章 "${row.title}" 吗？`,
-        '确认删除',
-        {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
+    const handleDelete = async (row) => {
+      try {
+        await ElMessageBox.confirm(
+          `确定要删除文章 "${row.title}" 吗？`,
+          '确认删除',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+        
+        const result = await ArticleService.delete(row.id)
+        if (result.success) {
+          ElMessage.success('删除成功')
+          fetchData()
+        } else {
+          ElMessage.error(result.message || '删除失败')
         }
-      ).then(() => {
-        // 模拟删除操作
-        ElMessage.success('删除成功')
-        fetchData()
-      }).catch(() => {
-        // 用户取消删除
-      })
+      } catch (error) {
+        if (error !== 'cancel') {
+          console.error('删除失败:', error)
+          ElMessage.error('删除失败')
+        }
+      }
     }
     
     onMounted(() => {
+      fetchCategories()
       fetchData()
     })
     
@@ -242,6 +260,8 @@ export default {
       tableData,
       pagination,
       filterForm,
+      categories,
+      fetchCategories,
       handleSearch,
       handleReset,
       handleSizeChange,

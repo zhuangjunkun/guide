@@ -3,20 +3,26 @@ import { supabase, TABLES, handleSupabaseError } from '@/utils/supabase'
 
 export class CategoryService {
   // 获取所有分类
-  static async getAll() {
+  static async getAll(filters = {}) {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from(TABLES.CATEGORIES)
         .select('*')
-        .order('created_at', { ascending: false })
+        .order('sort_order', { ascending: true });
+
+      if (filters.is_active !== undefined) {
+        query = query.eq('is_active', filters.is_active);
+      }
+
+      const { data, error } = await query;
       
-      if (error) throw error
-      return { success: true, data: data || [] }
+      if (error) throw error;
+      return { success: true, data: data || [] };
     } catch (error) {
       return { 
         success: false, 
         message: handleSupabaseError(error, '获取分类列表') 
-      }
+      };
     }
   }
 
@@ -42,12 +48,18 @@ export class CategoryService {
   // 创建分类
   static async create(categoryData) {
     try {
+      // 生成 slug
+      const slug = categoryData.slug || categoryData.name.toLowerCase().replace(/\s+/g, '-')
+      
       const { data, error } = await supabase
         .from(TABLES.CATEGORIES)
         .insert([{
           name: categoryData.name,
+          slug: slug,
           description: categoryData.description || '',
-          status: categoryData.status !== undefined ? categoryData.status : true,
+          icon: categoryData.icon || null,
+          sort_order: categoryData.sort_order || 0,
+          is_active: categoryData.is_active !== undefined ? categoryData.is_active : true,
           created_at: new Date().toISOString()
         }])
         .select()
@@ -66,14 +78,25 @@ export class CategoryService {
   // 更新分类
   static async update(id, categoryData) {
     try {
+      // 生成 slug（如果提供了新的名称）
+      const updateData = {
+        name: categoryData.name,
+        description: categoryData.description || '',
+        icon: categoryData.icon || null,
+        sort_order: categoryData.sort_order || 0,
+        is_active: categoryData.is_active,
+        updated_at: new Date().toISOString()
+      }
+      
+      if (categoryData.slug) {
+        updateData.slug = categoryData.slug
+      } else if (categoryData.name) {
+        updateData.slug = categoryData.name.toLowerCase().replace(/\s+/g, '-')
+      }
+
       const { data, error } = await supabase
         .from(TABLES.CATEGORIES)
-        .update({
-          name: categoryData.name,
-          description: categoryData.description || '',
-          status: categoryData.status,
-          updated_at: new Date().toISOString()
-        })
+        .update(updateData)
         .eq('id', id)
         .select()
         .single()

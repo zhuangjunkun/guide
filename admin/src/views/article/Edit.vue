@@ -50,12 +50,14 @@
                 v-model="form.category_id" 
                 placeholder="请选择分类"
                 style="width: 100%"
+                :loading="categoriesLoading"
               >
-                <el-option label="景点" value="1" />
-                <el-option label="美食" value="2" />
-                <el-option label="住宿" value="3" />
-                <el-option label="购物" value="4" />
-                <el-option label="文化" value="5" />
+                <el-option 
+                  v-for="category in categories"
+                  :key="category.id"
+                  :label="category.name"
+                  :value="category.id"
+                />
               </el-select>
             </el-form-item>
           </el-col>
@@ -83,43 +85,62 @@
           </div>
         </el-form-item>
         
-        <el-form-item label="图片" prop="images">
+        <el-form-item label="封面图片" prop="cover_image">
           <el-upload
-            v-model:file-list="form.images"
-            class="upload-demo"
-            action="/api/upload"
-            multiple
-            :limit="5"
-            list-type="picture-card"
+            class="cover-uploader"
+            :show-file-list="false"
+            :http-request="handleCoverUpload"
+            :before-upload="beforeCoverUpload"
           >
-            <el-icon><Plus /></el-icon>
+            <img v-if="form.cover_image" :src="form.cover_image" class="cover-image" />
+            <el-icon v-else class="cover-uploader-icon"><Plus /></el-icon>
           </el-upload>
           <div class="upload-tip">
-            最多可上传5张图片，支持JPG、PNG格式，每张图片不超过5MB
+            支持JPG、PNG格式，图片不超过5MB
           </div>
         </el-form-item>
         
         <el-row :gutter="20">
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="浏览量">
               <el-input v-model="form.views" disabled />
             </el-form-item>
           </el-col>
           
-          <el-col :span="12">
+          <el-col :span="8">
             <el-form-item label="点赞数">
               <el-input v-model="form.likes" disabled />
             </el-form-item>
           </el-col>
+          
+          <el-col :span="8">
+            <el-form-item label="作者">
+              <el-input v-model="form.author" placeholder="请输入作者" />
+            </el-form-item>
+          </el-col>
         </el-row>
         
-        <el-form-item label="状态" prop="status">
-          <el-switch
-            v-model="form.status"
-            active-text="发布"
-            inactive-text="草稿"
-          />
-        </el-form-item>
+        <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="发布状态" prop="is_published">
+              <el-switch
+                v-model="form.is_published"
+                active-text="已发布"
+                inactive-text="草稿"
+              />
+            </el-form-item>
+          </el-col>
+          
+          <el-col :span="12">
+            <el-form-item label="推荐文章" prop="is_featured">
+              <el-switch
+                v-model="form.is_featured"
+                active-text="推荐"
+                inactive-text="普通"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
         
         <el-form-item>
           <el-button 
@@ -137,45 +158,49 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
+import { ArticleService } from '@/services/article.js'
+import { CategoryService } from '@/services/category.js'
+import { UploadService } from '@/services/upload.js'
 
 export default {
   name: 'ArticleEdit',
   components: {
     Plus
   },
-  props: {
-    id: {
-      type: [String, Number],
-      required: true
-    }
-  },
   
-  setup(props) {
+  setup() {
     const router = useRouter()
     const route = useRoute()
     const formRef = ref()
     const loading = ref(false)
     const submitLoading = ref(false)
+    const categoriesLoading = ref(false)
+    const categories = ref([])
     
-    // 表单数据
+    const articleId = computed(() => route.params.id)
+    
     const form = reactive({
       id: '',
       title: '',
-      category_id: '',
+      slug: '',
       summary: '',
       content: '',
-      images: [],
+      cover_image: '',
+      category_id: null,
+      author: '',
       views: 0,
       likes: 0,
-      status: true,
-      created_at: ''
+      is_published: false,
+      is_featured: false,
+      published_at: '',
+      created_at: '',
+      updated_at: ''
     })
     
-    // 表单验证规则
     const rules = {
       title: [
         { required: true, message: '请输入文章标题', trigger: 'blur' },
@@ -184,46 +209,78 @@ export default {
       category_id: [
         { required: true, message: '请选择分类', trigger: 'change' }
       ],
-      summary: [
-        { max: 200, message: '长度不能超过 200 个字符', trigger: 'blur' }
-      ],
       content: [
         { required: true, message: '请输入文章内容', trigger: 'blur' }
       ]
     }
     
-    // 获取文章详情
-    const fetchArticle = async () => {
-      loading.value = true
-      
+    const fetchCategories = async () => {
+      categoriesLoading.value = true
       try {
-        // 模拟获取数据
-        await new Promise(resolve => setTimeout(resolve, 500))
-        
-        // 模拟数据
-        Object.assign(form, {
-          id: props.id,
-          title: '西湖十景完整攻略，带你领略杭州最美风光',
-          category_id: '1',
-          summary: '西湖作为杭州的标志性景点，拥有着千年的历史文化底蕴。本攻略将带你游遍西湖十景，感受江南水乡的独特魅力...',
-          content: '西湖十景完整攻略内容...\n\n西湖作为杭州的标志性景点，拥有着千年的历史文化底蕴。本攻略将带你游遍西湖十景，感受江南水乡的独特魅力。\n\n1. 苏堤春晓\n2. 曲院风荷\n3. 平湖秋月\n4. 断桥残雪\n5. 花港观鱼\n6. 柳浪闻莺\n7. 三潭印月\n8. 双峰插云\n9. 雷峰夕照\n10. 南屏晚钟',
-          images: [
-            { name: 'image1.jpg', url: 'https://picsum.photos/300/200?random=1' },
-            { name: 'image2.jpg', url: 'https://picsum.photos/300/200?random=2' }
-          ],
-          views: 1250,
-          likes: 89,
-          status: true,
-          created_at: '2024-01-01 12:00:00'
-        })
+        const result = await CategoryService.getAll({ is_active: true })
+        if (result.success) {
+          categories.value = result.data
+        } else {
+          ElMessage.error('获取分类列表失败: ' + result.message)
+        }
+      } catch (error) {
+        ElMessage.error('获取分类列表失败: ' + error.message)
+      } finally {
+        categoriesLoading.value = false
+      }
+    }
+    
+    const fetchArticle = async () => {
+      if (!articleId.value) return
+      
+      loading.value = true
+      try {
+        const result = await ArticleService.getById(articleId.value)
+        if (result.success) {
+          const article = result.data
+          Object.assign(form, {
+            ...article,
+            published_at: article.published_at ? new Date(article.published_at).toLocaleString() : '',
+            created_at: article.created_at ? new Date(article.created_at).toLocaleString() : '',
+            updated_at: article.updated_at ? new Date(article.updated_at).toLocaleString() : ''
+          })
+        } else {
+          ElMessage.error('获取文章信息失败: ' + result.message)
+          router.push('/articles')
+        }
       } catch (error) {
         ElMessage.error('获取文章信息失败: ' + error.message)
+        router.push('/articles')
       } finally {
         loading.value = false
       }
     }
     
-    // 提交表单
+    const handleCoverUpload = async (options) => {
+      const file = options.file;
+      const result = await UploadService.uploadImage(file);
+      if (result.success) {
+        form.cover_image = result.data.url;
+        ElMessage.success('图片上传成功');
+      } else {
+        ElMessage.error(`图片上传失败: ${result.message}`);
+      }
+    };
+    
+    const beforeCoverUpload = (file) => {
+      const isImg = ['image/jpeg', 'image/png'].includes(file.type)
+      const isLt5M = file.size / 1024 / 1024 < 5
+      if (!isImg) {
+        ElMessage.error('上传图片只能是 JPG/PNG 格式!')
+        return false
+      }
+      if (!isLt5M) {
+        ElMessage.error('上传图片大小不能超过 5MB!')
+        return false
+      }
+      return true
+    }
+    
     const submitForm = async () => {
       if (!formRef.value) return
       
@@ -232,11 +289,25 @@ export default {
           submitLoading.value = true
           
           try {
-            // 模拟提交数据
-            await new Promise(resolve => setTimeout(resolve, 1000))
+            const updateData = {
+              title: form.title,
+              slug: form.slug,
+              summary: form.summary,
+              content: form.content,
+              cover_image: form.cover_image,
+              category_id: form.category_id,
+              author: form.author,
+              is_published: form.is_published,
+              is_featured: form.is_featured
+            }
             
-            ElMessage.success('更新成功')
-            router.push('/articles')
+            const result = await ArticleService.update(articleId.value, updateData)
+            if (result.success) {
+              ElMessage.success('更新成功')
+              router.push('/articles')
+            } else {
+              ElMessage.error('更新失败: ' + result.message)
+            }
           } catch (error) {
             ElMessage.error('更新失败: ' + error.message)
           } finally {
@@ -246,12 +317,12 @@ export default {
       })
     }
     
-    // 重置表单
     const resetForm = () => {
       fetchArticle()
     }
     
     onMounted(() => {
+      fetchCategories()
       fetchArticle()
     })
     
@@ -259,8 +330,12 @@ export default {
       formRef,
       loading,
       submitLoading,
+      categoriesLoading,
+      categories,
       form,
       rules,
+      handleCoverUpload,
+      beforeCoverUpload,
       submitForm,
       resetForm
     }
@@ -272,33 +347,49 @@ export default {
 .article-edit {
   padding: 20px;
 }
-
 .form-card {
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
-
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-
 .article-form {
   max-width: 800px;
   margin: 0 auto;
 }
-
 .editor-container {
   border: 1px solid #dcdfe6;
   border-radius: 4px;
   padding: 10px;
 }
-
-.upload-demo {
-  width: 100%;
+.cover-uploader {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
 }
-
+.cover-uploader:hover {
+  border-color: #409eff;
+}
+.cover-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+  line-height: 178px;
+}
+.cover-image {
+  width: 178px;
+  height: 178px;
+  display: block;
+  object-fit: cover;
+}
 .upload-tip {
   font-size: 12px;
   color: #999;
